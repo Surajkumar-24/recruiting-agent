@@ -1,0 +1,27 @@
+Lead Product Designer
+
+Company: FinNext (Series B Fintech, Mumbai)
+Location: Mumbai / Hybrid
+Experience: 6–10 years
+
+About the Role:
+We are looking for a Lead Product Designer to own the end-to-end design of our consumer lending and payments products. You will collaborate closely with Product, Engineering, and Data teams to create intuitive, high-quality experiences for millions of users.
+
+Responsibilities:
+- Lead the design of core product flows across mobile (iOS/Android) and web
+- Define and evolve our design system and component library
+- Conduct user research, usability testing, and synthesize insights
+- Mentor 2–3 junior designers
+- Partner with PMs to shape product strategy from a design lens
+- Present design decisions to senior leadership and stakeholders
+
+Requirements:
+- 6+ years of experience in product/UX design, with 2+ years in a lead or senior role
+- Strong portfolio demonstrating end-to-end product thinking
+- Proficiency in Figma, Principle, or equivalent tools
+- Experience designing for fintech, payments, or financial products preferred
+- Solid understanding of iOS and Android design guidelines
+- Familiarity with design tokens, component libraries, and design systems
+- Ability to run user research and translate findings into design decisions
+- Excellent communication and stakeholder management skills
+- Bachelor's degree in Design, HCI, or related field (NID, IIT, NIFT preferred)

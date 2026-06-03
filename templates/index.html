@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Recruiting Agent</title>
+<style>
+  :root {
+    --bg: #f8f7f4; --surface: #ffffff; --border: #e5e3dc;
+    --text: #1a1a18; --muted: #6b6b67; --hint: #a8a8a4;
+    --accent: #1a1a18;
+    --green-bg: #edf7ee; --green: #2d7a3a; --green-border: #b8debb;
+    --amber-bg: #fdf3e3; --amber: #92600a; --amber-border: #f5d99a;
+    --blue-bg: #e8f1fb; --blue: #1a4f8a; --blue-border: #b3cff0;
+    --red-bg: #fdf0ef; --red: #a33030; --red-border: #f5bcbc;
+    --radius: 8px; --radius-lg: 12px;
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'Courier New', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .logo { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .key-status { display: flex; gap: 8px; }
+  .key-pill { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
+  .key-pill.ok  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .key-pill.bad { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-border); }
+
+  .main { max-width: 860px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+  .steps { display: flex; align-items: center; margin-bottom: 2.5rem; }
+  .step-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--hint); }
+  .step-item.active { color: var(--text); font-weight: 600; }
+  .step-item.done { color: var(--green); }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; background: var(--surface); }
+  .step-item.active .step-num { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .step-item.done .step-num { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 10px; }
+
+  .panel { display: none; } .panel.active { display: block; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.25rem; }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 1.25rem; color: var(--text); }
+
+  .field { margin-bottom: 1.1rem; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
+  .field label .req { color: var(--red); margin-left: 2px; }
+  input[type=text], textarea, select {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--border);
+    border-radius: var(--radius); font-family: var(--font); font-size: 14px;
+    color: var(--text); background: var(--bg); outline: none; transition: border-color .15s;
+  }
+  input[type=text]:focus, textarea:focus, select:focus { border-color: var(--accent); background: #fff; }
+  input.error, textarea.error { border-color: var(--red); background: var(--red-bg); }
+  textarea { resize: vertical; min-height: 60px; line-height: 1.6; }
+  .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .frow3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .hint-text { font-size: 11px; color: var(--hint); margin-top: 4px; }
+
+  .tag-wrap { border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 8px; display: flex; flex-wrap: wrap; gap: 6px; min-height: 42px; cursor: text; background: var(--bg); }
+  .tag-wrap:focus-within { border-color: var(--accent); background: #fff; }
+  .tag { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; font-size: 12px; padding: 3px 8px; display: flex; align-items: center; gap: 5px; color: var(--text); }
+  .tag-x { background: none; border: none; cursor: pointer; padding: 0; font-size: 14px; color: var(--hint); line-height: 1; }
+  .tag-x:hover { color: var(--red); }
+  .tag-wrap input { border: none; outline: none; font-size: 13px; background: transparent; padding: 3px 4px; flex: 1; min-width: 120px; color: var(--text); }
+
+  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 20px; border-radius: var(--radius); font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font); transition: all .15s; }
+  .btn:hover { background: var(--bg); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { opacity: .88; }
+  .btn.success { background: var(--green); color: #fff; border-color: var(--green); }
+  .btn.success:hover { opacity: .88; }
+  .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem; }
+
+  .xray-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; position: relative; }
+  .xray-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; }
+  .xray-str { font-family: var(--mono); font-size: 12px; color: var(--text); line-height: 1.55; word-break: break-all; padding-right: 70px; }
+  .xray-copy { position: absolute; top: 10px; right: 10px; font-size: 11px; padding: 4px 10px; }
+
+  .progress-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
+  .progress-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .progress-label strong { color: var(--text); }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 4px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s ease; }
+  .search-log { margin-top: 12px; }
+  .log-item { font-size: 12px; color: var(--muted); padding: 4px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
+  .log-item:last-child { border-bottom: none; }
+  .log-count { font-weight: 600; color: var(--green); }
+  .log-warn { font-weight: 600; color: var(--amber); }
+
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .65s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .cand-table { width: 100%; border-collapse: collapse; }
+  .cand-table th { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; padding: 8px 12px; background: var(--bg); border-bottom: 1px solid var(--border); text-align: left; }
+  .cand-table td { padding: 11px 12px; border-bottom: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+  .cand-table tr:last-child td { border-bottom: none; }
+  .cand-table tr:hover td { background: var(--bg); }
+  .av { width: 34px; height: 34px; border-radius: 50%; background: var(--blue-bg); color: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+  .cname { font-weight: 600; color: var(--text); }
+  .cmeta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .clink { font-size: 12px; color: var(--blue); text-decoration: none; }
+  .clink:hover { text-decoration: underline; }
+  .score { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 5px; white-space: nowrap; }
+  .score.hi  { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .score.mid { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .score.lo  { background: var(--bg);       color: var(--muted); border: 1px solid var(--border); }
+
+  .note { display: flex; gap: 10px; align-items: flex-start; padding: 11px 14px; border-radius: var(--radius); font-size: 13px; line-height: 1.5; margin-bottom: 1.25rem; }
+  .note.amber { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .note.blue  { background: var(--blue-bg);  color: var(--blue);  border: 1px solid var(--blue-border); }
+  .note.red   { background: var(--red-bg);   color: var(--red);   border: 1px solid var(--red-border); }
+
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 1.25rem; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+  .stat-val { font-size: 26px; font-weight: 700; color: var(--text); line-height: 1; }
+  .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .empty-note { text-align: center; padding: 2rem; color: var(--muted); font-size: 14px; }
+  .table-wrap { overflow-x: auto; }
+  .section-sep { height: 1px; background: var(--border); margin: 1.5rem 0; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo"><div class="logo-dot"></div>AI Recruiting Agent</div>
+  <div class="key-status" id="keyStatus"></div>
+</div>
+
+<div class="main">
+
+  <div class="steps">
+    <div class="step-item active" id="nav1"><div class="step-num" id="snum1">1</div>Job details</div>
+    <div class="step-line"></div>
+    <div class="step-item" id="nav2"><div class="step-num" id="snum2">2</div>Source candidates</div>
+    <div class="step-line"></div>
+    <div class="step-item" id="nav3"><div class="step-num" id="snum3">3</div>Results & export</div>
+  </div>
+
+  <!-- ── PANEL 1: Manual JD form ── -->
+  <div class="panel active" id="panel1">
+
+    <div class="card">
+      <div class="card-title">Role basics</div>
+      <div class="frow" style="margin-bottom:14px">
+        <div class="field" style="margin:0">
+          <label>Job title <span class="req">*</span></label>
+          <input type="text" id="jobTitle" placeholder="e.g. Senior Product Designer">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Location <span class="req">*</span></label>
+          <input type="text" id="location" placeholder="e.g. Mumbai, Bangalore">
+        </div>
+      </div>
+      <div class="frow3">
+        <div class="field" style="margin:0">
+          <label>Experience <span class="req">*</span></label>
+          <input type="text" id="experience" placeholder="e.g. 5-8 years">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Industry</label>
+          <input type="text" id="industry" placeholder="e.g. Fintech, SaaS">
+        </div>
+        <div class="field" style="margin:0">
+          <label>Seniority</label>
+          <select id="seniority">
+            <option value="">Any</option>
+            <option>Junior</option>
+            <option>Mid</option>
+            <option>Senior</option>
+            <option>Lead</option>
+            <option>Principal</option>
+            <option>Director</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Skills</div>
+      <div class="field">
+        <label>Technical skills <span class="req">*</span></label>
+        <div class="tag-wrap" id="techWrap" onclick="this.querySelector('input').focus()">
+          <input type="text" id="techInput" placeholder="Type a skill and press Enter — e.g. Figma, Sketch, Prototyping…" onkeydown="addTag(event,'techWrap','techTags')">
+        </div>
+        <div class="hint-text">Press Enter after each skill to add it as a tag</div>
+      </div>
+      <div class="field">
+        <label>Functional skills</label>
+        <div class="tag-wrap" id="funcWrap" onclick="this.querySelector('input').focus()">
+          <input type="text" id="funcInput" placeholder="Type a skill and press Enter — e.g. User research, Stakeholder management…" onkeydown="addTag(event,'funcWrap','funcTags')">
+        </div>
+        <div class="hint-text">Press Enter after each skill to add it as a tag</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Targeting</div>
+      <div class="frow">
+        <div class="field" style="margin:0">
+          <label>Preferred companies</label>
+          <input type="text" id="preferredCompanies" placeholder="e.g. Razorpay, PhonePe, CRED, Groww">
+          <div class="hint-text">Comma-separated — leave blank to search all companies</div>
+        </div>
+        <div class="field" style="margin:0">
+          <label>Academic background</label>
+          <input type="text" id="academic" placeholder="e.g. B.Des, NID, IIT, MBA">
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="field" style="margin:0">
+          <label>Job description <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--hint)">(optional — used to improve X-ray strings)</span></label>
+          <textarea id="jdText" style="min-height:80px" placeholder="Paste JD here if you have it — helps generate better search strings. Not required."></textarea>
+        </div>
+      </div>
+      <div style="margin-top:14px">
+        <div class="field" style="margin:0">
+          <label>Search depth</label>
+          <select id="maxSearches">
+            <option value="4">4 strings — fast (uses 4 SerpAPI credits)</option>
+            <option value="6" selected>6 strings — balanced (uses 6 credits)</option>
+            <option value="8">8 strings — thorough (uses 8 credits)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div id="validationError" class="note red" style="display:none">
+      ⚠ Please fill in Job title, Location, Experience, and at least one Technical skill before continuing.
+    </div>
+
+    <div class="btn-row">
+      <button class="btn primary" onclick="startPipeline()">
+        Source candidates →
+      </button>
+    </div>
+  </div>
+
+  <!-- ── PANEL 2: Running ── -->
+  <div class="panel" id="panel2">
+    <div class="progress-wrap">
+      <div class="progress-label">
+        <div class="spinner" id="mainSpinner"></div>
+        <strong id="mainMsg">Starting...</strong>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="mainBar" style="width:0%"></div></div>
+    </div>
+
+    <div class="card" id="xraySection" style="display:none">
+      <div class="card-title">X-ray search strings generated</div>
+      <div id="xrayList"></div>
+    </div>
+
+    <div class="card" id="searchLogCard" style="display:none">
+      <div class="card-title">Live search log</div>
+      <div id="searchLog" class="search-log"></div>
+    </div>
+  </div>
+
+  <!-- ── PANEL 3: Results ── -->
+  <div class="panel" id="panel3">
+    <div class="card" style="text-align:center;padding:3rem 2rem">
+      <div id="successIcon" style="font-size:48px;margin-bottom:1rem">✅</div>
+      <div id="resultHeading" style="font-size:22px;font-weight:700;margin-bottom:0.5rem">Your file is ready!</div>
+      <div id="resultSub" style="font-size:14px;color:var(--muted);margin-bottom:2rem">Candidates have been sourced, scored, and saved to a CSV file.</div>
+      <button class="btn success" onclick="downloadCSV()" style="font-size:15px;padding:12px 32px;margin-bottom:1rem">
+        ↓ Download CSV file
+      </button>
+      <div style="font-size:12px;color:var(--hint);margin-bottom:2rem" id="filenameLabel"></div>
+      <div class="section-sep"></div>
+      <button class="btn" onclick="startOver()" style="margin-top:1.5rem">↺ Start new search</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const tags = { techTags:[], funcTags:[] };
+let allCandidates = [], csvFilename = '';
+
+// Key status
+fetch('/api/check-keys').then(r=>r.json()).then(d=>{
+  document.getElementById('keyStatus').innerHTML =
+    `<div class="key-pill ${d.groq?'ok':'bad'}">Groq API ${d.groq?'✓':'✗'}</div>` +
+    `<div class="key-pill ${d.serp?'ok':'bad'}">SerpAPI ${d.serp?'✓':'✗'}</div>`;
+});
+
+// Tag helpers
+function addTag(e, wrapId, key) {
+  if (e.key !== 'Enter') return;
+  const v = e.target.value.trim();
+  if (!v) return;
+  tags[key].push(v);
+  const w = document.getElementById(wrapId);
+  const t = document.createElement('div'); t.className = 'tag';
+  t.innerHTML = v + '<button class="tag-x" onclick="rmTag(this,\''+key+'\',\''+v+'\')">×</button>';
+  w.insertBefore(t, w.querySelector('input'));
+  e.target.value = '';
+  e.preventDefault();
+}
+function rmTag(btn, key, val) {
+  tags[key] = tags[key].filter(t=>t!==val);
+  btn.parentElement.remove();
+}
+function clearTags(key, wrapId) {
+  tags[key] = [];
+  document.getElementById(wrapId).querySelectorAll('.tag').forEach(t=>t.remove());
+}
+
+// Step nav
+function goTo(n) {
+  [1,2,3].forEach(i => {
+    document.getElementById('panel'+i).classList.toggle('active', i===n);
+    const nav = document.getElementById('nav'+i);
+    const num = document.getElementById('snum'+i);
+    nav.classList.remove('active','done');
+    if (i===n) { nav.classList.add('active'); num.textContent=i; }
+    else if (i<n) { nav.classList.add('done'); num.textContent='✓'; }
+    else { num.textContent=i; }
+  });
+}
+
+// Validate form
+function validate() {
+  let ok = true;
+  const required = ['jobTitle','location','experience'];
+  required.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el.value.trim()) { el.classList.add('error'); ok=false; }
+    else el.classList.remove('error');
+  });
+  if (tags.techTags.length === 0) {
+    document.getElementById('techWrap').style.borderColor='var(--red)';
+    ok = false;
+  } else {
+    document.getElementById('techWrap').style.borderColor='';
+  }
+  document.getElementById('validationError').style.display = ok ? 'none' : 'flex';
+  return ok;
+}
+
+// Main pipeline
+function startPipeline() {
+  if (!validate()) return;
+
+  goTo(2);
+  document.getElementById('xraySection').style.display='none';
+  document.getElementById('searchLogCard').style.display='none';
+  document.getElementById('xrayList').innerHTML='';
+  document.getElementById('searchLog').innerHTML='';
+  allCandidates = [];
+  csvFilename = '';
+
+  const params = new URLSearchParams({
+    jd:                 document.getElementById('jdText').value,
+    companies:          document.getElementById('preferredCompanies').value,
+    title:              document.getElementById('jobTitle').value,
+    location:           document.getElementById('location').value,
+    experience:         document.getElementById('experience').value,
+    industry:           document.getElementById('industry').value,
+    academic:           document.getElementById('academic').value,
+    seniority:          document.getElementById('seniority').value,
+    techSkills:         tags.techTags.join(','),
+    funcSkills:         tags.funcTags.join(','),
+    max_searches:       document.getElementById('maxSearches').value,
+    results_per_search: 10,
+  });
+
+  const es = new EventSource('/api/run?' + params.toString());
+
+  es.addEventListener('status', e => {
+    const d = JSON.parse(e.data);
+    document.getElementById('mainMsg').textContent = d.msg;
+    document.getElementById('mainBar').style.width = d.pct + '%';
+  });
+
+  es.addEventListener('xrays', e => {
+    const xrays = JSON.parse(e.data);
+    document.getElementById('xraySection').style.display='block';
+    const list = document.getElementById('xrayList');
+    list.innerHTML = '';
+    xrays.forEach((x,i) => {
+      const card = document.createElement('div'); card.className='xray-card';
+      card.innerHTML = `<div class="xray-label">${i+1}. ${x.label}</div><div class="xray-str">${x.string}</div><button class="btn xray-copy" onclick="copyText('${x.string.replace(/'/g,"\\'")}',this)">Copy</button>`;
+      list.appendChild(card);
+    });
+  });
+
+  es.addEventListener('search_result', e => {
+    const d = JSON.parse(e.data);
+    document.getElementById('searchLogCard').style.display='block';
+    const log = document.getElementById('searchLog');
+    const row = document.createElement('div'); row.className='log-item';
+    row.innerHTML = `<span>${d.string_label}</span><span class="log-count">+${d.found} profiles found (${d.total} total)</span>`;
+    log.appendChild(row);
+  });
+
+  es.addEventListener('warn', e => {
+    document.getElementById('searchLogCard').style.display='block';
+    const log = document.getElementById('searchLog');
+    const row = document.createElement('div'); row.className='log-item';
+    row.innerHTML = `<span>${e.data}</span><span class="log-warn">⚠ skipped</span>`;
+    log.appendChild(row);
+  });
+
+  es.addEventListener('candidates', e => {
+    allCandidates = JSON.parse(e.data);
+  });
+
+  es.addEventListener('done', e => {
+    const d = JSON.parse(e.data);
+    csvFilename = d.file;
+    es.close();
+    document.getElementById('filenameLabel').textContent = 'File: ' + d.file + ' · ' + d.count + ' candidates sourced';
+    goTo(3);
+  });
+
+  es.addEventListener('error', e => {
+    es.close();
+    document.getElementById('mainSpinner').style.display='none';
+    document.getElementById('mainMsg').textContent = '⚠ Error: ' + e.data;
+  });
+}
+
+
+function downloadCSV() {
+  if (!csvFilename) return;
+  window.location.href = '/api/download/' + encodeURIComponent(csvFilename);
+}
+
+function copyText(txt, btn) {
+  navigator.clipboard.writeText(txt).then(()=>{
+    btn.textContent='Copied!';
+    setTimeout(()=>btn.textContent='Copy', 1500);
+  });
+}
+
+function startOver() {
+  allCandidates = [];
+  csvFilename   = '';
+
+  ['jobTitle','location','experience','industry','academic','preferredCompanies','jdText'].forEach(id => {
+    document.getElementById(id).value = '';
+    document.getElementById(id).classList.remove('error');
+  });
+
+  document.getElementById('seniority').selectedIndex = 0;
+  document.getElementById('maxSearches').value = '6';
+
+  clearTags('techTags','techWrap');
+  clearTags('funcTags','funcWrap');
+
+  document.getElementById('techWrap').style.borderColor = '';
+  document.getElementById('validationError').style.display = 'none';
+  document.getElementById('xrayList').innerHTML = '';
+  document.getElementById('searchLog').innerHTML = '';
+  document.getElementById('xraySection').style.display = 'none';
+  document.getElementById('searchLogCard').style.display = 'none';
+  document.getElementById('mainBar').style.width = '0%';
+  document.getElementById('mainSpinner').style.display = 'block';
+  document.getElementById('filenameLabel').textContent = '';
+
+  goTo(1);
+}
+</script>
+</body>
+</html>
