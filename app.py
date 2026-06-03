@@ -308,5 +308,6 @@ if __name__ == "__main__":
         print("WARNING: GROQ_API_KEY not set. Get free key at https://console.groq.com")
     if not SERP_API_KEY:
         print("WARNING: SERP_API_KEY not set. Get free key at https://serpapi.com")
-    print("\n  AI Recruiting Agent running at http://localhost:5000\n")
-    app.run(debug=True, threaded=True, port=5000)
+    print("\n  AI Recruiting Agent running...\n")
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", debug=False, threaded=True, port=port)
