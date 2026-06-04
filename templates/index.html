@@ -898,6 +898,7 @@ async function saveGmail(){
 }
 
 
+function downloadCSV(){
   if(!csvFilename)return;
   window.location.href='/api/download/'+encodeURIComponent(csvFilename);
 }
