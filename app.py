@@ -205,15 +205,29 @@ Return ONLY JSON array of {len(batch)} objects, no markdown:
 
 def find_email_prospeo(linkedin_url):
     try:
+        # Clean the LinkedIn URL
+        clean_url = re.sub(r"\?.*$", "", linkedin_url).rstrip("/")
+        if not clean_url.startswith("https://"):
+            clean_url = "https://" + clean_url.lstrip("/")
+
         url     = "https://api.prospeo.io/linkedin-email-finder"
         headers = {"Content-Type": "application/json", "X-KEY": PROSPEO_API_KEY}
-        resp    = req.post(url, headers=headers, json={"url": linkedin_url}, timeout=15)
-        resp.raise_for_status()
+        resp    = req.post(url, headers=headers, json={"url": clean_url}, timeout=15)
+
+        print(f"Prospeo status: {resp.status_code} for {clean_url}")
         data = resp.json()
-        if data.get("error") == False and data.get("response", {}).get("email"):
-            return data["response"]["email"]["value"]
+        print(f"Prospeo response: {data}")
+
+        # Prospeo returns error: false when successful
+        if not data.get("error") and data.get("response"):
+            email_data = data["response"].get("email")
+            if email_data and isinstance(email_data, dict):
+                return email_data.get("value")
+            elif email_data and isinstance(email_data, str):
+                return email_data
         return None
-    except:
+    except Exception as e:
+        print(f"Prospeo error for {linkedin_url}: {e}")
         return None
 
 # ── Auth routes ───────────────────────────────────────────────────────────────
