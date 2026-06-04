@@ -3,155 +3,283 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mrs. Sourcer — AI Candidate Sourcing Agent</title>
+<title>Mrs. Sourcer — AI Candidate Sourcing & Outreach</title>
 <style>
-  :root {
-    /* AlphaNom-inspired color palette */
-    --bg:           #f0f4f8;
-    --surface:      #ffffff;
-    --border:       #e2e8f0;
-    --text:         #0f172a;
-    --muted:        #64748b;
-    --hint:         #94a3b8;
-    --teal:         #0d9488;
-    --teal-dark:    #0f766e;
-    --teal-bg:      #f0fdfa;
-    --teal-border:  #99f6e4;
-    --navy:         #1e293b;
-    --navy-light:   #334155;
-    --green:        #16a34a;
-    --green-bg:     #f0fdf4;
-    --green-border: #bbf7d0;
-    --amber:        #d97706;
-    --amber-bg:     #fffbeb;
-    --amber-border: #fde68a;
-    --red:          #dc2626;
-    --red-bg:       #fef2f2;
-    --red-border:   #fecaca;
-    --radius:       8px;
-    --radius-lg:    14px;
-    --font:         'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    --mono:         'JetBrains Mono', 'Courier New', monospace;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: var(--font); background: var(--bg); color: var(--text); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+:root {
+  --bg:#f0f4f8; --surface:#fff; --border:#e2e8f0;
+  --text:#0f172a; --muted:#64748b; --hint:#94a3b8;
+  --teal:#0d9488; --teal-dark:#0f766e; --teal-bg:#f0fdfa; --teal-border:#99f6e4;
+  --navy:#1e293b; --navy-light:#334155;
+  --green:#16a34a; --green-bg:#f0fdf4; --green-border:#bbf7d0;
+  --amber:#d97706; --amber-bg:#fffbeb; --amber-border:#fde68a;
+  --red:#dc2626; --red-bg:#fef2f2; --red-border:#fecaca;
+  --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#ddd6fe;
+  --radius:8px; --radius-lg:14px;
+  --font:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;
+  --mono:'JetBrains Mono','Courier New',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px;line-height:1.6;min-height:100vh}
 
-  /* ── Topbar ── */
-  .topbar { background: var(--navy); padding: 0 2rem; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 1px 8px rgba(0,0,0,.18); }
-  .logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon { width: 32px; height: 32px; background: var(--teal); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-  .logo-text { font-weight: 700; font-size: 17px; color: #fff; letter-spacing: -0.3px; }
-  .logo-text span { color: var(--teal); }
-  .key-status { display: flex; gap: 8px; }
-  .key-pill { font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 600; }
-  .key-pill.ok  { background: var(--teal-bg); color: var(--teal-dark); border: 1px solid var(--teal-border); }
-  .key-pill.bad { background: var(--red-bg);  color: var(--red);       border: 1px solid var(--red-border); }
+/* Topbar */
+.topbar{background:var(--navy);padding:0 2rem;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 8px rgba(0,0,0,.2)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:32px;height:32px;background:var(--teal);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-text{font-weight:700;font-size:17px;color:#fff}
+.logo-text span{color:var(--teal)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.user-badge{font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:6px}
+.plan-chip{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;background:var(--teal-bg);color:var(--teal-dark);border:1px solid var(--teal-border)}
+.plan-chip.free{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-border)}
 
-  /* ── Hero banner ── */
-  .hero { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); padding: 2.5rem 2rem; text-align: center; }
-  .hero-title { font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.5px; margin-bottom: 8px; }
-  .hero-title span { color: var(--teal); }
-  .hero-sub { font-size: 15px; color: #94a3b8; max-width: 580px; margin: 0 auto 1.5rem; line-height: 1.7; }
-  .how-it-works { display: flex; justify-content: center; gap: 0; flex-wrap: wrap; margin-top: 1.5rem; }
-  .hw-step { display: flex; align-items: center; gap: 8px; }
-  .hw-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--teal); color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-  .hw-label { font-size: 12px; color: #cbd5e1; font-weight: 500; }
-  .hw-arrow { color: #475569; font-size: 16px; margin: 0 10px; }
+/* Auth overlay */
+.auth-overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.auth-box{background:var(--surface);border-radius:var(--radius-lg);padding:2.5rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.auth-logo{text-align:center;margin-bottom:1.5rem}
+.auth-logo-icon{width:52px;height:52px;background:var(--teal);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:8px}
+.auth-title{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:4px;text-align:center}
+.auth-sub{font-size:13px;color:var(--muted);text-align:center;margin-bottom:1.5rem}
+.auth-tabs{display:flex;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:1.5rem}
+.auth-tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--muted);border:none;font-family:var(--font)}
+.auth-tab.active{background:var(--navy);color:#fff}
 
-  /* ── Main layout ── */
-  .main { max-width: 880px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+/* Pricing modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:680px;box-shadow:0 20px 60px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
+.modal-title{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.plans-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.plan-card{border:2px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;position:relative;cursor:pointer;transition:all .15s}
+.plan-card:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(13,148,136,.15)}
+.plan-card.recommended{border-color:var(--teal);background:var(--teal-bg)}
+.plan-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--teal);color:#fff;font-size:10px;font-weight:700;padding:2px 10px;border-radius:20px;white-space:nowrap}
+.plan-name{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.plan-price{font-size:26px;font-weight:800;color:var(--navy);line-height:1}
+.plan-period{font-size:12px;color:var(--muted)}
+.plan-features{margin-top:12px;font-size:13px;color:var(--muted);display:flex;flex-direction:column;gap:5px}
+.plan-feature{display:flex;align-items:center;gap:6px}
+.plan-feature::before{content:'✓';color:var(--teal);font-weight:700;flex-shrink:0}
 
-  /* ── Steps nav ── */
-  .steps { display: flex; align-items: center; margin-bottom: 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.5rem; }
-  .step-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--hint); }
-  .step-item.active { color: var(--text); font-weight: 600; }
-  .step-item.done { color: var(--teal-dark); }
-  .step-num { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; background: var(--surface); }
-  .step-item.active .step-num { border-color: var(--teal); background: var(--teal); color: #fff; }
-  .step-item.done .step-num { border-color: var(--teal-dark); background: var(--teal-bg); color: var(--teal-dark); }
-  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 12px; }
+/* Main layout */
+.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);padding:2rem 2rem 1.5rem;text-align:center}
+.hero-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:6px}
+.hero-title span{color:var(--teal)}
+.hero-sub{font-size:14px;color:#94a3b8;max-width:560px;margin:0 auto .75rem}
+.hw-row{display:flex;justify-content:center;gap:0;flex-wrap:wrap;margin-top:.75rem}
+.hw-step{display:flex;align-items:center;gap:6px}
+.hw-dot{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.hw-label{font-size:11px;color:#cbd5e1;font-weight:500}
+.hw-arrow{color:#475569;font-size:14px;margin:0 8px}
 
-  /* ── Panels ── */
-  .panel { display: none; } .panel.active { display: block; }
+.main{max-width:900px;margin:0 auto;padding:1.5rem 1.5rem 4rem}
 
-  /* ── Cards ── */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,.04); }
-  .card-title { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: .05em; display: flex; align-items: center; gap: 8px; }
-  .card-title::before { content:''; width:3px; height:16px; background:var(--teal); border-radius:2px; display:inline-block; }
+/* Usage bar */
+.usage-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.usage-item{display:flex;align-items:center;gap:8px;font-size:13px}
+.usage-label{color:var(--muted)}
+.usage-val{font-weight:600;color:var(--text)}
+.usage-low{color:var(--red)}
+.upgrade-btn{font-size:12px;padding:5px 14px;background:var(--teal);color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-family:var(--font)}
 
-  /* ── Form fields ── */
-  .field { margin-bottom: 1.1rem; }
-  .field:last-child { margin-bottom: 0; }
-  .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 6px; }
-  .field label .req { color: var(--red); margin-left: 2px; }
-  input[type=text], textarea, select {
-    width: 100%; padding: 10px 13px; border: 1.5px solid var(--border);
-    border-radius: var(--radius); font-family: var(--font); font-size: 14px;
-    color: var(--text); background: #fff; outline: none; transition: border-color .15s, box-shadow .15s;
-  }
-  input[type=text]:focus, textarea:focus, select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
-  input.error, textarea.error { border-color: var(--red); background: var(--red-bg); }
-  textarea { resize: vertical; min-height: 60px; line-height: 1.6; }
-  .frow  { display: grid; grid-template-columns: 1fr 1fr;       gap: 14px; }
-  .frow3 { display: grid; grid-template-columns: 1fr 1fr 1fr;   gap: 14px; }
-  .hint-text { font-size: 11px; color: var(--hint); margin-top: 4px; }
+/* Steps */
+.steps{display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:.875rem 1.25rem;margin-bottom:1.25rem}
+.step-item{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--hint)}
+.step-item.active{color:var(--text);font-weight:600}
+.step-item.done{color:var(--teal-dark)}
+.step-num{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;background:var(--surface)}
+.step-item.active .step-num{border-color:var(--teal);background:var(--teal);color:#fff}
+.step-item.done .step-num{border-color:var(--teal-dark);background:var(--teal-bg);color:var(--teal-dark)}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 10px}
 
-  /* ── Tag input ── */
-  .tag-wrap { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 6px 8px; display: flex; flex-wrap: wrap; gap: 6px; min-height: 44px; cursor: text; background: #fff; transition: border-color .15s; }
-  .tag-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,148,136,.1); }
-  .tag { background: var(--teal-bg); border: 1px solid var(--teal-border); border-radius: 5px; font-size: 12px; padding: 3px 9px; display: flex; align-items: center; gap: 5px; color: var(--teal-dark); font-weight: 500; }
-  .tag-x { background: none; border: none; cursor: pointer; padding: 0; font-size: 14px; color: var(--teal); line-height: 1; }
-  .tag-x:hover { color: var(--red); }
-  .tag-wrap input { border: none; outline: none; font-size: 13px; background: transparent; padding: 3px 4px; flex: 1; min-width: 120px; color: var(--text); }
+.panel{display:none}.panel.active{display:block}
 
-  /* ── Buttons ── */
-  .btn { display: inline-flex; align-items: center; gap: 7px; padding: 10px 22px; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--border); background: var(--surface); color: var(--text); font-family: var(--font); transition: all .15s; }
-  .btn:hover { background: var(--bg); }
-  .btn.primary { background: var(--teal); color: #fff; border-color: var(--teal); box-shadow: 0 2px 8px rgba(13,148,136,.25); }
-  .btn.primary:hover { background: var(--teal-dark); border-color: var(--teal-dark); }
-  .btn.success { background: var(--green); color: #fff; border-color: var(--green); box-shadow: 0 2px 8px rgba(22,163,74,.2); }
-  .btn.success:hover { opacity: .9; }
-  .btn-row { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.5rem; }
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.25rem;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:1.1rem;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.card-title::before{content:'';width:3px;height:14px;background:var(--teal);border-radius:2px;display:inline-block}
 
-  /* ── X-ray cards ── */
-  .xray-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; position: relative; }
-  .xray-label { font-size: 11px; font-weight: 700; color: var(--teal-dark); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 5px; }
-  .xray-str { font-family: var(--mono); font-size: 12px; color: var(--navy); line-height: 1.55; word-break: break-all; padding-right: 70px; }
-  .xray-copy { position: absolute; top: 10px; right: 10px; font-size: 11px; padding: 4px 10px; }
+/* Form */
+.field{margin-bottom:1rem}.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.req{color:var(--red);margin-left:2px}
+input[type=text],input[type=email],input[type=password],textarea,select{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-family:var(--font);font-size:14px;color:var(--text);background:#fff;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+input.err{border-color:var(--red);background:var(--red-bg)}
+textarea{resize:vertical;min-height:60px;line-height:1.6}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.hint-text{font-size:11px;color:var(--hint);margin-top:4px}
 
-  /* ── Progress ── */
-  .progress-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.25rem 1.5rem; margin-bottom: 1.25rem; }
-  .progress-label { font-size: 13px; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
-  .progress-label strong { color: var(--text); }
-  .progress-bar { height: 5px; background: var(--border); border-radius: 4px; overflow: hidden; }
-  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--teal), var(--teal-dark)); border-radius: 4px; transition: width .4s ease; }
-  .search-log { margin-top: 12px; }
-  .log-item { font-size: 12px; color: var(--muted); padding: 5px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; }
-  .log-item:last-child { border-bottom: none; }
-  .log-count { font-weight: 600; color: var(--teal-dark); }
-  .log-warn  { font-weight: 600; color: var(--amber); }
+/* Tags */
+.tag-wrap{border:1.5px solid var(--border);border-radius:var(--radius);padding:6px 8px;display:flex;flex-wrap:wrap;gap:5px;min-height:42px;cursor:text;background:#fff}
+.tag-wrap:focus-within{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.1)}
+.tag{background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:4px;font-size:12px;padding:2px 8px;display:flex;align-items:center;gap:4px;color:var(--teal-dark);font-weight:500}
+.tag-x{background:none;border:none;cursor:pointer;padding:0;font-size:13px;color:var(--teal);line-height:1}
+.tag-x:hover{color:var(--red)}
+.tag-wrap input{border:none;outline:none;font-size:13px;background:transparent;padding:2px 4px;flex:1;min-width:100px;color:var(--text)}
 
-  /* ── Spinner ── */
-  .spinner { width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--teal); border-radius: 50%; animation: spin .65s linear infinite; flex-shrink: 0; }
-  @keyframes spin { to { transform: rotate(360deg); } }
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 20px;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:var(--font);transition:all .15s}
+.btn:hover{background:var(--bg)}
+.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal);box-shadow:0 2px 8px rgba(13,148,136,.25)}
+.btn.primary:hover{background:var(--teal-dark)}
+.btn.success{background:var(--green);color:#fff;border-color:var(--green)}
+.btn.success:hover{opacity:.9}
+.btn.danger{background:var(--red);color:#fff;border-color:var(--red)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-row{display:flex;gap:10px;justify-content:flex-end;margin-top:1.25rem}
 
-  /* ── Notes ── */
-  .note { display: flex; gap: 10px; align-items: flex-start; padding: 11px 14px; border-radius: var(--radius); font-size: 13px; line-height: 1.5; margin-bottom: 1.25rem; }
-  .note.amber { background: var(--amber-bg); color: var(--amber);    border: 1px solid var(--amber-border); }
-  .note.teal  { background: var(--teal-bg);  color: var(--teal-dark); border: 1px solid var(--teal-border); }
-  .note.red   { background: var(--red-bg);   color: var(--red);       border: 1px solid var(--red-border); }
+/* Progress */
+.progress-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;margin-bottom:1.25rem}
+.progress-label{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.progress-label strong{color:var(--text)}
+.prog-bar{height:5px;background:var(--border);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--teal-dark));border-radius:4px;transition:width .4s ease}
+.search-log{margin-top:10px}
+.log-item{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between}
+.log-item:last-child{border-bottom:none}
+.log-count{font-weight:600;color:var(--teal-dark)}
+.log-warn{font-weight:600;color:var(--amber)}
+.spinner{width:15px;height:15px;border:2px solid var(--border);border-top-color:var(--teal);border-radius:50%;animation:spin .65s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
 
-  /* ── Success card ── */
-  .success-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 3rem 2rem; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-  .success-icon { width: 64px; height: 64px; background: var(--teal-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 1.25rem; border: 2px solid var(--teal-border); }
-  .success-title { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
-  .success-sub { font-size: 14px; color: var(--muted); margin-bottom: 2rem; }
-  .filename-label { font-size: 12px; color: var(--hint); margin-top: 10px; }
-  .section-sep { height: 1px; background: var(--border); margin: 1.75rem 0; }
+/* Candidate table */
+.cand-table{width:100%;border-collapse:collapse}
+.cand-table th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;background:var(--bg);border-bottom:1px solid var(--border);text-align:left}
+.cand-table td{padding:10px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.cand-table tr:last-child td{border-bottom:none}
+.cand-table tr:hover td{background:#f8fafc}
+.cname{font-weight:600;color:var(--text)}
+.cmeta{font-size:12px;color:var(--muted);margin-top:1px}
+.clink{font-size:11px;color:var(--teal);text-decoration:none}
+.clink:hover{text-decoration:underline}
+.score{font-size:11px;font-weight:700;padding:3px 8px;border-radius:5px;white-space:nowrap}
+.score.hi{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+.score.mid{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.score.lo{background:var(--bg);color:var(--muted);border:1px solid var(--border)}
+.email-found{font-size:11px;color:var(--green);font-weight:500}
+.email-none{font-size:11px;color:var(--hint)}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--teal);cursor:pointer}
+
+/* Notes */
+.note{display:flex;gap:8px;align-items:flex-start;padding:10px 14px;border-radius:var(--radius);font-size:13px;line-height:1.5;margin-bottom:1rem}
+.note.amber{background:var(--amber-bg);color:var(--amber);border:1px solid var(--amber-border)}
+.note.teal{background:var(--teal-bg);color:var(--teal-dark);border:1px solid var(--teal-border)}
+.note.red{background:var(--red-bg);color:var(--red);border:1px solid var(--red-border)}
+.note.green{background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+
+/* Gmail connect banner */
+.gmail-banner{background:var(--purple-bg);border:1px solid var(--purple-border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.gmail-banner-text{font-size:13px;color:var(--purple);font-weight:500}
+
+/* Outreach textarea */
+#emailBody{min-height:160px;font-family:var(--font)}
+
+/* Success */
+.success-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2.5rem 2rem;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.success-icon{width:60px;height:60px;background:var(--teal-bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 1rem;border:2px solid var(--teal-border)}
+.success-title{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.success-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.sep{height:1px;background:var(--border);margin:1.5rem 0}
+
+/* Outreach history table */
+.history-table{width:100%;border-collapse:collapse}
+.history-table th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;padding:8px 10px;background:var(--bg);border-bottom:1px solid var(--border);text-align:left}
+.history-table td{padding:10px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text)}
+.history-table tr:last-child td{border-bottom:none}
+.sent-badge{font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--green-bg);color:var(--green);border:1px solid var(--green-border)}
+
+/* Tabs */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:1.25rem}
+.tab{padding:9px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab.active{color:var(--teal);border-bottom-color:var(--teal)}
+.tab-panel{display:none}.tab-panel.active{display:block}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
+
+<!-- Auth Overlay -->
+<div class="auth-overlay" id="authOverlay">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-logo-icon">🎯</div>
+      <div class="auth-title">Mrs.<span style="color:var(--teal)">Sourcer</span></div>
+      <div class="auth-sub">AI-powered candidate sourcing & outreach</div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Log In</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')">Sign Up</button>
+    </div>
+    <div id="authLogin">
+      <div class="field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="loginPassword" placeholder="Your password"></div>
+      <div id="loginError" class="note red" style="display:none"></div>
+      <button class="btn primary" style="width:100%;justify-content:center;margin-top:.5rem" onclick="doLogin()">Log In →</button>
+    </div>
+    <div id="authSignup" style="display:none">
+      <div class="field"><label>Email</label><input type="email" id="signupEmail" placeholder="you@email.com"></div>
+      <div class="field"><label>Password</label><input type="password" id="signupPassword" placeholder="Min 8 characters"></div>
+      <div id="signupError" class="note red" style="display:none"></div>
+      <button class="btn primary" style="width:100%;justify-content:center;margin-top:.5rem" onclick="doSignup()">Create Free Account →</button>
+      <div style="font-size:12px;color:var(--hint);text-align:center;margin-top:10px">Free trial includes 1 search + 10 emails</div>
+    </div>
+  </div>
+</div>
+
+<!-- Pricing Modal -->
+<div class="modal-overlay" id="pricingModal">
+  <div class="modal-box">
+    <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:1rem">
+      <div>
+        <div class="modal-title">Upgrade Mrs. Sourcer</div>
+        <div class="modal-sub">Choose the plan that fits your recruiting needs</div>
+      </div>
+      <button class="btn" onclick="closePricing()" style="padding:6px 12px">✕</button>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-name">Free Trial</div>
+        <div class="plan-price">₹0</div>
+        <div class="plan-period">forever</div>
+        <div class="plan-features">
+          <div class="plan-feature">1 search run</div>
+          <div class="plan-feature">10 outreach emails</div>
+          <div class="plan-feature">CSV download</div>
+        </div>
+      </div>
+      <div class="plan-card recommended">
+        <div class="plan-badge">Most Popular</div>
+        <div class="plan-name">Individual</div>
+        <div class="plan-price">₹699</div>
+        <div class="plan-period">/month</div>
+        <div class="plan-features">
+          <div class="plan-feature">15 search runs</div>
+          <div class="plan-feature">100 outreach emails</div>
+          <div class="plan-feature">Email finder</div>
+          <div class="plan-feature">Gmail integration</div>
+          <div class="plan-feature">Outreach tracking</div>
+        </div>
+        <button class="btn primary" style="width:100%;justify-content:center;margin-top:1rem" onclick="subscribePlan('individual')">Subscribe ₹699/mo</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Agency</div>
+        <div class="plan-price">₹4,999</div>
+        <div class="plan-period">/month</div>
+        <div class="plan-features">
+          <div class="plan-feature">Unlimited searches</div>
+          <div class="plan-feature">1,000 outreach emails</div>
+          <div class="plan-feature">Email finder</div>
+          <div class="plan-feature">Gmail integration</div>
+          <div class="plan-feature">Team usage tracking</div>
+          <div class="plan-feature">Priority support</div>
+        </div>
+        <button class="btn primary" style="width:100%;justify-content:center;margin-top:1rem" onclick="subscribePlan('agency')">Subscribe ₹4,999/mo</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Topbar -->
 <div class="topbar">
@@ -159,329 +287,651 @@
     <div class="logo-icon">🎯</div>
     <div class="logo-text">Mrs.<span>Sourcer</span></div>
   </div>
-  <div class="key-status" id="keyStatus"></div>
+  <div class="topbar-right">
+    <div class="user-badge" id="userBadge" style="display:none">
+      <span id="userEmail"></span>
+      <span class="plan-chip" id="planChip"></span>
+    </div>
+    <button class="btn" onclick="openPricing()" id="upgradeTopBtn" style="display:none;font-size:12px;padding:6px 14px;background:var(--teal);color:#fff;border-color:var(--teal)">⬆ Upgrade</button>
+    <button class="btn" onclick="window.location='/auth/logout'" id="logoutBtn" style="display:none;font-size:12px;padding:6px 14px">Log out</button>
+  </div>
 </div>
 
 <!-- Hero -->
 <div class="hero">
-  <div class="hero-title">AI-Powered <span>Candidate Sourcing</span></div>
-  <div class="hero-sub">Mrs. Sourcer finds real LinkedIn profiles for any role in minutes. Fill in the job details, and she'll generate smart Google X-ray search strings, run them automatically, score every candidate against your requirements, and hand you a ready-to-use CSV.</div>
-  <div class="how-it-works">
+  <div class="hero-title">AI-Powered <span>Candidate Sourcing & Outreach</span></div>
+  <div class="hero-sub">Find real LinkedIn profiles, get their emails, and send personalised outreach — all in one place.</div>
+  <div class="hw-row">
     <div class="hw-step"><div class="hw-dot">1</div><div class="hw-label">Fill job details</div></div>
     <div class="hw-arrow">→</div>
-    <div class="hw-step"><div class="hw-dot">2</div><div class="hw-label">AI generates X-ray strings</div></div>
+    <div class="hw-step"><div class="hw-dot">2</div><div class="hw-label">AI sources candidates</div></div>
     <div class="hw-arrow">→</div>
-    <div class="hw-step"><div class="hw-dot">3</div><div class="hw-label">Google search runs</div></div>
+    <div class="hw-step"><div class="hw-dot">3</div><div class="hw-label">Select candidates</div></div>
     <div class="hw-arrow">→</div>
-    <div class="hw-step"><div class="hw-dot">4</div><div class="hw-label">Profiles scored & ranked</div></div>
+    <div class="hw-step"><div class="hw-dot">4</div><div class="hw-label">Find emails</div></div>
     <div class="hw-arrow">→</div>
-    <div class="hw-step"><div class="hw-dot">5</div><div class="hw-label">Download CSV</div></div>
+    <div class="hw-step"><div class="hw-dot">5</div><div class="hw-label">Send outreach</div></div>
   </div>
 </div>
 
 <div class="main">
 
-  <!-- Steps nav -->
-  <div class="steps">
-    <div class="step-item active" id="nav1"><div class="step-num" id="snum1">1</div>Job details</div>
-    <div class="step-line"></div>
-    <div class="step-item" id="nav2"><div class="step-num" id="snum2">2</div>Sourcing in progress</div>
-    <div class="step-line"></div>
-    <div class="step-item" id="nav3"><div class="step-num" id="snum3">3</div>Results & export</div>
+  <!-- Usage bar -->
+  <div class="usage-bar" id="usageBar" style="display:none">
+    <div style="display:flex;gap:1.5rem;flex-wrap:wrap">
+      <div class="usage-item">🔍 <span class="usage-label">Searches:</span> <span class="usage-val" id="usageSearches">—</span></div>
+      <div class="usage-item">✉️ <span class="usage-label">Emails:</span> <span class="usage-val" id="usageEmails">—</span></div>
+    </div>
+    <button class="upgrade-btn" onclick="openPricing()">⬆ Upgrade Plan</button>
   </div>
 
-  <!-- ── PANEL 1: Job details form ── -->
-  <div class="panel active" id="panel1">
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('source')">🔍 Source Candidates</div>
+    <div class="tab" onclick="switchTab('history')">📋 Outreach History</div>
+    <div class="tab" onclick="switchTab('settings')">⚙️ Settings</div>
+  </div>
 
-    <div class="card">
-      <div class="card-title">Role basics</div>
-      <div class="frow" style="margin-bottom:14px">
-        <div class="field" style="margin:0">
-          <label>Job title <span class="req">*</span></label>
-          <input type="text" id="jobTitle" placeholder="e.g. Senior Product Designer">
+  <!-- SOURCE TAB -->
+  <div class="tab-panel active" id="tab-source">
+
+    <!-- Steps nav -->
+    <div class="steps">
+      <div class="step-item active" id="nav1"><div class="step-num" id="snum1">1</div>Job details</div>
+      <div class="step-line"></div>
+      <div class="step-item" id="nav2"><div class="step-num" id="snum2">2</div>Sourcing</div>
+      <div class="step-line"></div>
+      <div class="step-item" id="nav3"><div class="step-num" id="snum3">3</div>Select & email</div>
+      <div class="step-line"></div>
+      <div class="step-item" id="nav4"><div class="step-num" id="snum4">4</div>Send outreach</div>
+    </div>
+
+    <!-- PANEL 1: Job details -->
+    <div class="panel active" id="panel1">
+      <div class="card">
+        <div class="card-title">Role basics</div>
+        <div class="frow" style="margin-bottom:12px">
+          <div class="field" style="margin:0"><label>Job title <span class="req">*</span></label><input type="text" id="jobTitle" placeholder="e.g. Senior Product Designer"></div>
+          <div class="field" style="margin:0"><label>Location <span class="req">*</span></label><input type="text" id="location" placeholder="e.g. Mumbai, Bangalore, Remote"></div>
         </div>
-        <div class="field" style="margin:0">
-          <label>Location <span class="req">*</span></label>
-          <input type="text" id="location" placeholder="e.g. Mumbai, Bangalore, Remote">
+        <div class="frow3">
+          <div class="field" style="margin:0"><label>Experience <span class="req">*</span></label><input type="text" id="experience" placeholder="e.g. 5-8 years"></div>
+          <div class="field" style="margin:0"><label>Industry</label><input type="text" id="industry" placeholder="e.g. Fintech, SaaS"></div>
+          <div class="field" style="margin:0"><label>Seniority</label>
+            <select id="seniority">
+              <option value="">Any</option>
+              <option>Intern / Fresher</option>
+              <option>Junior</option><option>Mid</option><option>Senior</option>
+              <option>Lead</option><option>Principal</option><option>Director</option>
+            </select>
+          </div>
         </div>
       </div>
-      <div class="frow3">
-        <div class="field" style="margin:0">
-          <label>Experience <span class="req">*</span></label>
-          <input type="text" id="experience" placeholder="e.g. 5-8 years">
+      <div class="card">
+        <div class="card-title">Skills</div>
+        <div class="field">
+          <label>Technical skills <span class="req">*</span></label>
+          <div class="tag-wrap" id="techWrap" onclick="this.querySelector('input').focus()">
+            <input type="text" id="techInput" placeholder="Type skill + Enter — e.g. Figma, Python…" onkeydown="addTag(event,'techWrap','techTags')">
+          </div>
         </div>
-        <div class="field" style="margin:0">
-          <label>Industry</label>
-          <input type="text" id="industry" placeholder="e.g. Fintech, SaaS">
+        <div class="field">
+          <label>Functional skills</label>
+          <div class="tag-wrap" id="funcWrap" onclick="this.querySelector('input').focus()">
+            <input type="text" id="funcInput" placeholder="Type skill + Enter — e.g. User research…" onkeydown="addTag(event,'funcWrap','funcTags')">
+          </div>
         </div>
-        <div class="field" style="margin:0">
-          <label>Seniority</label>
-          <select id="seniority">
-            <option value="">Any</option>
-            <option>Intern / Fresher</option>
-            <option>Junior</option>
-            <option>Mid</option>
-            <option>Senior</option>
-            <option>Lead</option>
-            <option>Principal</option>
-            <option>Director</option>
-          </select>
+      </div>
+      <div class="card">
+        <div class="card-title">Targeting</div>
+        <div class="frow" style="margin-bottom:12px">
+          <div class="field" style="margin:0"><label>Preferred companies</label><input type="text" id="preferredCompanies" placeholder="e.g. Razorpay, CRED, PhonePe"><div class="hint-text">Comma-separated</div></div>
+          <div class="field" style="margin:0"><label>Academic</label><input type="text" id="academic" placeholder="e.g. MBA, NID, IIT"></div>
+        </div>
+        <div class="frow">
+          <div class="field" style="margin:0"><label>Job description <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:10px;color:var(--hint)">(optional)</span></label><textarea id="jdText" style="min-height:65px" placeholder="Paste JD to improve X-ray strings…"></textarea></div>
+          <div class="field" style="margin:0"><label>Search depth</label>
+            <select id="maxSearches">
+              <option value="4">4 strings — fast (4 SerpAPI credits)</option>
+              <option value="6" selected>6 strings — balanced (6 credits)</option>
+              <option value="8">8 strings — thorough (8 credits)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div id="validationError" class="note red" style="display:none">⚠ Please fill in Job title, Location, Experience, and at least one Technical skill.</div>
+      <div class="btn-row">
+        <button class="btn primary" onclick="startPipeline()">🔍 &nbsp;Source candidates →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 2: Sourcing progress -->
+    <div class="panel" id="panel2">
+      <div class="progress-wrap">
+        <div class="progress-label"><div class="spinner" id="mainSpinner"></div><strong id="mainMsg">Starting Mrs. Sourcer…</strong></div>
+        <div class="prog-bar"><div class="prog-fill" id="mainBar" style="width:0%"></div></div>
+      </div>
+      <div class="card" id="xraySection" style="display:none">
+        <div class="card-title">X-ray strings generated</div>
+        <div id="xrayList"></div>
+      </div>
+      <div class="card" id="searchLogCard" style="display:none">
+        <div class="card-title">Live search log</div>
+        <div id="searchLog" class="search-log"></div>
+      </div>
+    </div>
+
+    <!-- PANEL 3: Select candidates + find emails -->
+    <div class="panel" id="panel3">
+      <div id="gmailBanner" class="gmail-banner" style="display:none">
+        <div class="gmail-banner-text">📧 Connect your Gmail to send outreach emails — takes 2 minutes</div>
+        <button class="btn primary" onclick="switchTab('settings')" style="font-size:12px;padding:7px 16px">Connect Gmail →</button>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
+          <div style="font-weight:700;font-size:14px;color:var(--navy)" id="candidateCountLabel"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn" onclick="selectAll()" style="font-size:12px;padding:6px 12px">Select all</button>
+            <button class="btn" onclick="downloadCSV()" style="font-size:12px;padding:6px 12px">⬇ Download CSV</button>
+            <button class="btn primary" onclick="findEmails()" id="findEmailsBtn" style="font-size:12px;padding:6px 14px">🔍 Find emails for selected</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="cand-table">
+            <thead><tr>
+              <th style="width:36px"><input type="checkbox" id="selectAllChk" onchange="toggleAll(this)"></th>
+              <th>#</th><th>Candidate</th><th style="width:65px">Score</th>
+              <th>Email</th><th>Why</th>
+            </tr></thead>
+            <tbody id="candBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="goTo(1)">← Back</button>
+        <button class="btn primary" onclick="proceedToOutreach()" id="outreachBtn">✉️ &nbsp;Write outreach →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 4: Send outreach -->
+    <div class="panel" id="panel4">
+      <div id="gmailWarning" class="note amber" style="display:none">
+        ⚠ Gmail not connected. <button onclick="switchTab('settings')" style="background:none;border:none;color:var(--amber);font-weight:600;cursor:pointer;font-size:13px;padding:0">Go to Settings →</button> to connect your Gmail.
+      </div>
+      <div class="card">
+        <div class="card-title">Selected candidates</div>
+        <div id="selectedList" style="font-size:13px;color:var(--muted)"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Outreach email</div>
+        <div class="field">
+          <label>Subject line <span class="req">*</span></label>
+          <input type="text" id="emailSubject" placeholder="e.g. Exciting opportunity at [Company] — would love to connect">
+        </div>
+        <div class="field">
+          <label>Email body <span class="req">*</span></label>
+          <textarea id="emailBody" placeholder="Write your personalised outreach message here…
+
+Hi [Name],
+
+I came across your profile and was impressed by your experience in [skill].
+
+We are hiring for a [Job Title] role at [Company] and I believe you could be a great fit.
+
+Would you be open to a quick 15-minute call to learn more?
+
+Best regards,
+[Your Name]"></textarea>
+        </div>
+        <div class="note teal">💡 Tip: Use [Name], [Company], [Job Title] as placeholders — personalise before sending for better response rates.</div>
+      </div>
+      <div class="btn-row">
+        <button class="btn" onclick="goTo(3)">← Back</button>
+        <button class="btn primary" onclick="sendOutreach()" id="sendBtn">✉️ &nbsp;Send emails →</button>
+      </div>
+    </div>
+
+    <!-- PANEL 5: Done -->
+    <div class="panel" id="panel5">
+      <div class="success-card">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Outreach sent!</div>
+        <div class="success-sub" id="sentSummary"></div>
+        <div class="sep"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn success" onclick="downloadCSV()">⬇ Download CSV</button>
+          <button class="btn" onclick="switchTab('history')">📋 View outreach history</button>
+          <button class="btn" onclick="startOver()">↺ New search</button>
         </div>
       </div>
     </div>
 
+  </div><!-- /tab-source -->
+
+  <!-- HISTORY TAB -->
+  <div class="tab-panel" id="tab-history">
+    <div class="card" style="padding:0;overflow:hidden">
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-weight:700;font-size:14px;color:var(--navy)">Outreach history</div>
+      <div id="historyContent" style="overflow-x:auto">
+        <div style="padding:2rem;text-align:center;color:var(--muted);font-size:14px">Loading…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div class="tab-panel" id="tab-settings">
     <div class="card">
-      <div class="card-title">Skills</div>
+      <div class="card-title">Gmail settings</div>
+      <div class="note teal" style="margin-bottom:1.25rem">
+        📧 Emails will be sent from your Gmail account. You need to create a Gmail App Password — it takes 2 minutes and is completely free.
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:1.25rem;font-size:13px;color:var(--muted);line-height:1.8">
+        <strong style="color:var(--navy)">How to get your Gmail App Password:</strong><br>
+        1. Go to <a href="https://myaccount.google.com/security" target="_blank" style="color:var(--teal)">myaccount.google.com/security</a><br>
+        2. Turn on <strong>2-Step Verification</strong> if not already on<br>
+        3. Search <strong>"App passwords"</strong> in the search bar<br>
+        4. Select app: <strong>Mail</strong> → Select device: <strong>Other</strong> → type "Mrs Sourcer"<br>
+        5. Click <strong>Generate</strong> → Copy the 16-character password shown
+      </div>
       <div class="field">
-        <label>Technical skills <span class="req">*</span></label>
-        <div class="tag-wrap" id="techWrap" onclick="this.querySelector('input').focus()">
-          <input type="text" id="techInput" placeholder="Type a skill and press Enter — e.g. Figma, Python, SQL…" onkeydown="addTag(event,'techWrap','techTags')">
-        </div>
-        <div class="hint-text">Press Enter after each skill to add it as a tag</div>
+        <label>Your Gmail address</label>
+        <input type="email" id="gmailAddress" placeholder="yourname@gmail.com">
       </div>
       <div class="field">
-        <label>Functional skills</label>
-        <div class="tag-wrap" id="funcWrap" onclick="this.querySelector('input').focus()">
-          <input type="text" id="funcInput" placeholder="Type a skill and press Enter — e.g. User research, Team leadership…" onkeydown="addTag(event,'funcWrap','funcTags')">
-        </div>
-        <div class="hint-text">Press Enter after each skill to add it as a tag</div>
+        <label>Gmail App Password</label>
+        <input type="password" id="gmailAppPassword" placeholder="16-character app password (no spaces needed)">
       </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Targeting & search settings</div>
-      <div class="frow" style="margin-bottom:14px">
-        <div class="field" style="margin:0">
-          <label>Preferred companies</label>
-          <input type="text" id="preferredCompanies" placeholder="e.g. Razorpay, PhonePe, CRED, Groww">
-          <div class="hint-text">Comma-separated — leave blank to search all companies</div>
-        </div>
-        <div class="field" style="margin:0">
-          <label>Academic background</label>
-          <input type="text" id="academic" placeholder="e.g. B.Des, NID, IIT, MBA">
-        </div>
-      </div>
-      <div class="frow">
-        <div class="field" style="margin:0">
-          <label>Job description <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--hint)">(optional — improves search accuracy)</span></label>
-          <textarea id="jdText" style="min-height:70px" placeholder="Paste JD here if you have it — helps generate better X-ray strings."></textarea>
-        </div>
-        <div class="field" style="margin:0">
-          <label>Search depth</label>
-          <select id="maxSearches">
-            <option value="4">4 strings — fast (4 SerpAPI credits)</option>
-            <option value="6" selected>6 strings — balanced (6 credits)</option>
-            <option value="8">8 strings — thorough (8 credits)</option>
-          </select>
-          <div class="hint-text" style="margin-top:8px">Free SerpAPI plan = 100 credits/month</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="validationError" class="note red" style="display:none">
-      ⚠ Please fill in Job title, Location, Experience, and at least one Technical skill before continuing.
-    </div>
-
-    <div class="btn-row">
-      <button class="btn primary" onclick="startPipeline()">
-        🔍 &nbsp;Start sourcing candidates →
-      </button>
-    </div>
-  </div>
-
-  <!-- ── PANEL 2: Running ── -->
-  <div class="panel" id="panel2">
-    <div class="progress-wrap">
-      <div class="progress-label">
-        <div class="spinner" id="mainSpinner"></div>
-        <strong id="mainMsg">Starting Mrs. Sourcer…</strong>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="mainBar" style="width:0%"></div></div>
-    </div>
-    <div class="card" id="xraySection" style="display:none">
-      <div class="card-title">X-ray strings generated</div>
-      <div id="xrayList"></div>
-    </div>
-    <div class="card" id="searchLogCard" style="display:none">
-      <div class="card-title">Live search log</div>
-      <div id="searchLog" class="search-log"></div>
-    </div>
-  </div>
-
-  <!-- ── PANEL 3: Results ── -->
-  <div class="panel" id="panel3">
-    <div class="success-card">
-      <div class="success-icon">✅</div>
-      <div class="success-title">Your candidates are ready!</div>
-      <div class="success-sub">Mrs. Sourcer has sourced, scored, and ranked candidates for your role. Download the CSV to review them in Excel or Google Sheets.</div>
-      <button class="btn success" onclick="downloadCSV()" style="font-size:15px;padding:13px 36px;">
-        ⬇ &nbsp;Download CSV file
-      </button>
-      <div class="filename-label" id="filenameLabel"></div>
-      <div class="section-sep"></div>
-      <div style="font-size:13px;color:var(--muted);margin-bottom:1rem">The CSV includes: Candidate name · LinkedIn URL · Current role · Match score · Reason · Source string · Date</div>
-      <button class="btn" onclick="startOver()">↺ &nbsp;Start new search</button>
+      <div id="gmailSaveMsg" style="display:none;margin-bottom:.75rem"></div>
+      <button class="btn primary" onclick="saveGmail()">Save & verify Gmail →</button>
     </div>
   </div>
 
 </div><!-- /main -->
 
 <script>
-const tags = { techTags:[], funcTags:[] };
-let allCandidates = [], csvFilename = '';
+// ── State ─────────────────────────────────────────────────────────────────────
+const tags = {techTags:[],funcTags:[]};
+let allCandidates=[], csvFilename='', userProfile=null;
 
-// Key status
-fetch('/api/check-keys').then(r=>r.json()).then(d=>{
-  document.getElementById('keyStatus').innerHTML =
-    `<div class="key-pill ${d.groq?'ok':'bad'}">Groq API ${d.groq?'✓':'✗'}</div>` +
-    `<div class="key-pill ${d.serp?'ok':'bad'}">SerpAPI ${d.serp?'✓':'✗'}</div>`;
+// ── Init ──────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', async () => {
+  await loadMe();
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('gmail') === 'connected') {
+    showNote('✅ Gmail connected successfully!', 'green');
+    await loadMe();
+  }
 });
 
-function addTag(e, wrapId, key) {
-  if (e.key !== 'Enter') return;
-  const v = e.target.value.trim(); if (!v) return;
-  tags[key].push(v);
-  const w = document.getElementById(wrapId);
-  const t = document.createElement('div'); t.className = 'tag';
-  t.innerHTML = v + '<button class="tag-x" onclick="rmTag(this,\''+key+'\',\''+v+'\')">×</button>';
-  w.insertBefore(t, w.querySelector('input'));
-  e.target.value = ''; e.preventDefault();
+async function loadMe() {
+  const res = await fetch('/api/me');
+  const data = await res.json();
+  if (!data.logged_in) {
+    document.getElementById('authOverlay').style.display='flex';
+    return;
+  }
+  userProfile = data;
+  document.getElementById('authOverlay').style.display='none';
+  document.getElementById('userBadge').style.display='flex';
+  document.getElementById('userEmail').textContent = data.email;
+  document.getElementById('planChip').textContent = data.plan_name;
+  document.getElementById('planChip').className = 'plan-chip' + (data.plan==='free'?' free':'');
+  document.getElementById('logoutBtn').style.display='block';
+  document.getElementById('upgradeTopBtn').style.display = data.plan==='free'?'block':'none';
+  document.getElementById('usageBar').style.display='flex';
+  const sl = data.searches_limit===999?'∞':data.searches_limit;
+  const el = data.emails_limit===1000?'1000':data.emails_limit;
+  document.getElementById('usageSearches').textContent = `${data.searches_used}/${sl}`;
+  document.getElementById('usageEmails').textContent = `${data.emails_used}/${el}`;
+  if (!data.gmail_connected) {
+    document.getElementById('gmailBanner').style.display='flex';
+    document.getElementById('gmailWarning').style.display='flex';
+  }
 }
-function rmTag(btn, key, val) { tags[key] = tags[key].filter(t=>t!==val); btn.parentElement.remove(); }
-function clearTags(key, wrapId) { tags[key] = []; document.getElementById(wrapId).querySelectorAll('.tag').forEach(t=>t.remove()); }
 
-function goTo(n) {
-  [1,2,3].forEach(i => {
-    document.getElementById('panel'+i).classList.toggle('active', i===n);
-    const nav = document.getElementById('nav'+i);
-    const num = document.getElementById('snum'+i);
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function switchAuthTab(tab) {
+  document.getElementById('authLogin').style.display = tab==='login'?'block':'none';
+  document.getElementById('authSignup').style.display = tab==='signup'?'block':'none';
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='signup')));
+}
+async function doLogin() {
+  const email=document.getElementById('loginEmail').value.trim();
+  const pass=document.getElementById('loginPassword').value.trim();
+  const res=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+  const data=await res.json();
+  if(data.ok){ await loadMe(); }
+  else{ const el=document.getElementById('loginError'); el.style.display='flex'; el.textContent='⚠ '+data.error; }
+}
+async function doSignup() {
+  const email=document.getElementById('signupEmail').value.trim();
+  const pass=document.getElementById('signupPassword').value.trim();
+  if(pass.length<8){ const el=document.getElementById('signupError'); el.style.display='flex'; el.textContent='⚠ Password must be at least 8 characters'; return; }
+  const res=await fetch('/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+  const data=await res.json();
+  if(data.ok){ await loadMe(); }
+  else{ const el=document.getElementById('signupError'); el.style.display='flex'; el.textContent='⚠ '+data.error; }
+}
+
+// ── Tags ──────────────────────────────────────────────────────────────────────
+function addTag(e,wrapId,key){
+  if(e.key!=='Enter')return;
+  const v=e.target.value.trim(); if(!v)return;
+  tags[key].push(v);
+  const w=document.getElementById(wrapId);
+  const t=document.createElement('div'); t.className='tag';
+  t.innerHTML=v+'<button class="tag-x" onclick="rmTag(this,\''+key+'\',\''+v+'\')">×</button>';
+  w.insertBefore(t,w.querySelector('input'));
+  e.target.value=''; e.preventDefault();
+}
+function rmTag(btn,key,val){tags[key]=tags[key].filter(t=>t!==val);btn.parentElement.remove();}
+function clearTags(key,wrapId){tags[key]=[];document.getElementById(wrapId).querySelectorAll('.tag').forEach(t=>t.remove());}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goTo(n){
+  [1,2,3,4,5].forEach(i=>{
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    const nav=document.getElementById('nav'+i);
+    const num=document.getElementById('snum'+i);
+    if(!nav)return;
     nav.classList.remove('active','done');
-    if (i===n) { nav.classList.add('active'); num.textContent=i; }
-    else if (i<n) { nav.classList.add('done'); num.textContent='✓'; }
+    if(i===n){nav.classList.add('active');num.textContent=i;}
+    else if(i<n){nav.classList.add('done');num.textContent='✓';}
     else num.textContent=i;
   });
 }
 
-function validate() {
-  let ok = true;
-  ['jobTitle','location','experience'].forEach(id => {
-    const el = document.getElementById(id);
-    if (!el.value.trim()) { el.classList.add('error'); ok=false; }
-    else el.classList.remove('error');
+function switchTab(name){
+  const tabNames = ['source','history','settings'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', tabNames[i]===name));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='history') loadHistory();
+  if(name==='settings' && userProfile) {
+    if(userProfile.gmail_address) document.getElementById('gmailAddress').value = userProfile.gmail_address;
+  }
+}
+
+// ── Validate ──────────────────────────────────────────────────────────────────
+function validate(){
+  let ok=true;
+  ['jobTitle','location','experience'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el.value.trim()){el.classList.add('err');ok=false;}
+    else el.classList.remove('err');
   });
-  if (tags.techTags.length === 0) { document.getElementById('techWrap').style.borderColor='var(--red)'; ok=false; }
+  if(tags.techTags.length===0){document.getElementById('techWrap').style.borderColor='var(--red)';ok=false;}
   else document.getElementById('techWrap').style.borderColor='';
-  document.getElementById('validationError').style.display = ok ? 'none' : 'flex';
+  document.getElementById('validationError').style.display=ok?'none':'flex';
   return ok;
 }
 
-function startPipeline() {
-  if (!validate()) return;
+// ── Pipeline ──────────────────────────────────────────────────────────────────
+function startPipeline(){
+  if(!validate())return;
   goTo(2);
   document.getElementById('xraySection').style.display='none';
   document.getElementById('searchLogCard').style.display='none';
   document.getElementById('xrayList').innerHTML='';
   document.getElementById('searchLog').innerHTML='';
-  allCandidates = []; csvFilename = '';
+  allCandidates=[]; csvFilename='';
 
-  const params = new URLSearchParams({
-    jd:                 document.getElementById('jdText').value,
-    companies:          document.getElementById('preferredCompanies').value,
-    title:              document.getElementById('jobTitle').value,
-    location:           document.getElementById('location').value,
-    experience:         document.getElementById('experience').value,
-    industry:           document.getElementById('industry').value,
-    academic:           document.getElementById('academic').value,
-    seniority:          document.getElementById('seniority').value,
-    techSkills:         tags.techTags.join(','),
-    funcSkills:         tags.funcTags.join(','),
-    max_searches:       document.getElementById('maxSearches').value,
-    results_per_search: 10,
+  const params=new URLSearchParams({
+    jd:document.getElementById('jdText').value,
+    companies:document.getElementById('preferredCompanies').value,
+    title:document.getElementById('jobTitle').value,
+    location:document.getElementById('location').value,
+    experience:document.getElementById('experience').value,
+    industry:document.getElementById('industry').value,
+    academic:document.getElementById('academic').value,
+    seniority:document.getElementById('seniority').value,
+    techSkills:tags.techTags.join(','),
+    funcSkills:tags.funcTags.join(','),
+    max_searches:document.getElementById('maxSearches').value,
+    results_per_search:10,
   });
 
-  const es = new EventSource('/api/run?' + params.toString());
+  const es=new EventSource('/api/run?'+params.toString());
 
-  es.addEventListener('status', e => {
-    const d = JSON.parse(e.data);
-    document.getElementById('mainMsg').textContent = d.msg;
-    document.getElementById('mainBar').style.width = d.pct + '%';
+  es.addEventListener('status',e=>{
+    const d=JSON.parse(e.data);
+    document.getElementById('mainMsg').textContent=d.msg;
+    document.getElementById('mainBar').style.width=d.pct+'%';
   });
-
-  es.addEventListener('xrays', e => {
-    const xrays = JSON.parse(e.data);
+  es.addEventListener('xrays',e=>{
+    const xrays=JSON.parse(e.data);
     document.getElementById('xraySection').style.display='block';
-    const list = document.getElementById('xrayList'); list.innerHTML='';
-    xrays.forEach((x,i) => {
-      const card = document.createElement('div'); card.className='xray-card';
-      card.innerHTML = `<div class="xray-label">${i+1}. ${x.label}</div><div class="xray-str">${x.string}</div><button class="btn xray-copy" onclick="copyText('${x.string.replace(/'/g,"\\'")}',this)">Copy</button>`;
-      list.appendChild(card);
+    const list=document.getElementById('xrayList'); list.innerHTML='';
+    xrays.forEach((x,i)=>{
+      const c=document.createElement('div'); c.className='xray-card'; c.style.cssText='background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:6px;position:relative';
+      c.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${i+1}. ${x.label}</div><div style="font-family:var(--mono);font-size:11px;color:var(--navy);word-break:break-all;padding-right:60px">${x.string}</div><button class="btn" style="position:absolute;top:8px;right:8px;font-size:10px;padding:3px 8px" onclick="navigator.clipboard.writeText('${x.string.replace(/'/g,"\\'")}');this.textContent='Copied!'">Copy</button>`;
+      list.appendChild(c);
     });
   });
-
-  es.addEventListener('search_result', e => {
-    const d = JSON.parse(e.data);
+  es.addEventListener('search_result',e=>{
+    const d=JSON.parse(e.data);
     document.getElementById('searchLogCard').style.display='block';
-    const log = document.getElementById('searchLog');
-    const row = document.createElement('div'); row.className='log-item';
-    row.innerHTML = `<span>${d.string_label}</span><span class="log-count">+${d.found} profiles (${d.total} total)</span>`;
+    const log=document.getElementById('searchLog');
+    const row=document.createElement('div'); row.className='log-item';
+    row.innerHTML=`<span>${d.string_label}</span><span class="log-count">+${d.found} profiles (${d.total} total)</span>`;
     log.appendChild(row);
   });
-
-  es.addEventListener('warn', e => {
+  es.addEventListener('warn',e=>{
     document.getElementById('searchLogCard').style.display='block';
-    const log = document.getElementById('searchLog');
-    const row = document.createElement('div'); row.className='log-item';
-    row.innerHTML = `<span>${e.data}</span><span class="log-warn">⚠ skipped</span>`;
+    const log=document.getElementById('searchLog');
+    const row=document.createElement('div'); row.className='log-item';
+    row.innerHTML=`<span>${e.data}</span><span class="log-warn">⚠ skipped</span>`;
     log.appendChild(row);
   });
-
-  es.addEventListener('candidates', e => { allCandidates = JSON.parse(e.data); });
-
-  es.addEventListener('done', e => {
-    const d = JSON.parse(e.data);
-    csvFilename = d.file;
+  es.addEventListener('candidates',e=>{allCandidates=JSON.parse(e.data);});
+  es.addEventListener('done',e=>{
+    const d=JSON.parse(e.data);
+    csvFilename=d.file;
     es.close();
-    document.getElementById('filenameLabel').textContent = d.file + ' · ' + d.count + ' candidates sourced';
+    renderCandidates();
     goTo(3);
+    loadMe();
   });
-
-  es.addEventListener('error', e => {
+  es.addEventListener('error',e=>{
     es.close();
     document.getElementById('mainSpinner').style.display='none';
-    document.getElementById('mainMsg').textContent = '⚠ Error: ' + e.data;
+    document.getElementById('mainMsg').textContent='⚠ '+e.data;
   });
 }
 
-function downloadCSV() {
-  if (!csvFilename) return;
-  window.location.href = '/api/download/' + encodeURIComponent(csvFilename);
-}
-
-function copyText(txt, btn) {
-  navigator.clipboard.writeText(txt).then(()=>{ btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1500); });
-}
-
-function startOver() {
-  allCandidates = []; csvFilename = '';
-  ['jobTitle','location','experience','industry','academic','preferredCompanies','jdText'].forEach(id => {
-    document.getElementById(id).value = '';
-    document.getElementById(id).classList.remove('error');
+// ── Candidates table ──────────────────────────────────────────────────────────
+function renderCandidates(){
+  document.getElementById('candidateCountLabel').textContent=`${allCandidates.length} candidates sourced`;
+  const tbody=document.getElementById('candBody'); tbody.innerHTML='';
+  allCandidates.forEach((c,i)=>{
+    const sc=c.score>=80?'hi':c.score>=60?'mid':'lo';
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><input type="checkbox" class="cand-chk" data-idx="${i}" checked></td>
+      <td style="color:var(--hint);font-size:12px">${i+1}</td>
+      <td>
+        <div class="cname">${c.name||'—'}</div>
+        <div class="cmeta">${c.headline||''}</div>
+        <a class="clink" href="${c.linkedin}" target="_blank" rel="noopener">${c.linkedin}</a>
+      </td>
+      <td><span class="score ${sc}">${c.score}%</span></td>
+      <td id="email-${i}"><span class="email-none">—</span></td>
+      <td style="font-size:12px;color:var(--muted);max-width:200px">${c.reason||'—'}</td>`;
+    tbody.appendChild(tr);
   });
-  document.getElementById('seniority').selectedIndex = 0;
-  document.getElementById('maxSearches').value = '6';
+}
+
+function selectAll(){
+  document.querySelectorAll('.cand-chk').forEach(c=>c.checked=true);
+  document.getElementById('selectAllChk').checked=true;
+}
+function toggleAll(chk){document.querySelectorAll('.cand-chk').forEach(c=>c.checked=chk.checked);}
+
+function getSelectedCandidates(){
+  return Array.from(document.querySelectorAll('.cand-chk:checked')).map(c=>allCandidates[parseInt(c.dataset.idx)]);
+}
+
+// ── Find emails ───────────────────────────────────────────────────────────────
+async function findEmails(){
+  const selected=getSelectedCandidates();
+  if(!selected.length){alert('Please select at least one candidate.');return;}
+
+  const btn=document.getElementById('findEmailsBtn');
+  btn.disabled=true; btn.textContent='Finding emails…';
+
+  const urls=selected.map(c=>c.linkedin);
+  try{
+    const res=await fetch('/api/find-emails',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({linkedin_urls:urls})});
+    const data=await res.json();
+    if(!data.ok){alert('Error: '+data.error);btn.disabled=false;btn.textContent='🔍 Find emails for selected';return;}
+    data.results.forEach(r=>{
+      const idx=allCandidates.findIndex(c=>c.linkedin===r.linkedin);
+      if(idx>=0){
+        allCandidates[idx].email=r.email||'';
+        const cell=document.getElementById('email-'+idx);
+        if(cell) cell.innerHTML=r.email?`<span class="email-found">✓ ${r.email}</span>`:`<span class="email-none">Not found</span>`;
+      }
+    });
+    const found=data.results.filter(r=>r.email).length;
+    showNote(`✅ Found ${found}/${selected.length} emails`, 'green');
+    loadMe();
+  }catch(e){alert('Error: '+e.message);}
+  btn.disabled=false; btn.textContent='🔍 Find emails for selected';
+}
+
+// ── Outreach ──────────────────────────────────────────────────────────────────
+function proceedToOutreach(){
+  const selected=getSelectedCandidates().filter(c=>c.email);
+  if(!selected.length){
+    alert('No selected candidates have emails. Please find emails first.');
+    return;
+  }
+  goTo(4);
+  const list=document.getElementById('selectedList');
+  list.innerHTML=selected.map(c=>`<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)"><div style="flex:1"><strong>${c.name}</strong> — ${c.headline||''}</div><div style="font-size:12px;color:var(--teal)">${c.email}</div></div>`).join('');
+}
+
+async function sendOutreach(){
+  const subject=document.getElementById('emailSubject').value.trim();
+  const body=document.getElementById('emailBody').value.trim();
+  if(!subject||!body){alert('Please fill in subject and email body.');return;}
+
+  const selected=getSelectedCandidates().filter(c=>c.email);
+  const btn=document.getElementById('sendBtn');
+  btn.disabled=true; btn.textContent='Sending…';
+
+  try{
+    const res=await fetch('/api/send-emails',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({candidates:selected,subject,body})});
+    const data=await res.json();
+    if(!data.ok){alert('Error: '+data.error);btn.disabled=false;btn.textContent='✉️ Send emails →';return;}
+    document.getElementById('sentSummary').textContent=`Successfully sent to ${data.sent.length} candidates.${data.failed.length?' '+data.failed.length+' failed.':''}`;
+    goTo(5);
+    loadMe();
+  }catch(e){alert('Error: '+e.message);}
+  btn.disabled=false; btn.textContent='✉️ Send emails →';
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+async function loadHistory(){
+  try{
+    const res=await fetch('/api/outreach-history');
+    const data=await res.json();
+    const el=document.getElementById('historyContent');
+    if(!data.ok||!data.history.length){
+      el.innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted);font-size:14px">No outreach sent yet.</div>';
+      return;
+    }
+    el.innerHTML=`<table class="history-table"><thead><tr><th>Candidate</th><th>Email</th><th>Subject</th><th>Sent at</th><th>Status</th></tr></thead><tbody>${
+      data.history.map(r=>`<tr><td><strong>${r.candidate_name}</strong><br><a href="${r.linkedin_url||'#'}" target="_blank" style="font-size:11px;color:var(--teal)">${r.linkedin_url||''}</a></td><td style="font-size:12px">${r.candidate_email}</td><td style="font-size:12px">${r.subject}</td><td style="font-size:12px;color:var(--muted)">${new Date(r.sent_at).toLocaleString('en-IN')}</td><td><span class="sent-badge">Sent</span></td></tr>`).join('')
+    }</tbody></table>`;
+  }catch(e){document.getElementById('historyContent').innerHTML='<div style="padding:2rem;text-align:center;color:var(--red)">Failed to load history.</div>';}
+}
+
+// ── Pricing ───────────────────────────────────────────────────────────────────
+function openPricing(){document.getElementById('pricingModal').classList.add('open');}
+function closePricing(){document.getElementById('pricingModal').classList.remove('open');}
+
+async function subscribePlan(planId){
+  const res=await fetch('/api/create-subscription',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:planId})});
+  const data=await res.json();
+  if(!data.ok){alert('Error: '+data.error);return;}
+
+  const prices={'individual':69900,'agency':499900};
+  const names={'individual':'Individual','agency':'Agency'};
+
+  const options={
+    key: '{{ razorpay_key }}',
+    subscription_id: data.subscription_id,
+    name: 'Mrs. Sourcer',
+    description: names[planId]+' Plan',
+    amount: prices[planId],
+    currency: 'INR',
+    handler: async function(response){
+      await fetch('/api/payment-success',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({plan:planId,payment_id:response.razorpay_payment_id})});
+      closePricing();
+      await loadMe();
+      showNote('🎉 Plan upgraded successfully!','green');
+    }
+  };
+  const rzp=new Razorpay(options);
+  rzp.open();
+}
+
+// ── Misc ──────────────────────────────────────────────────────────────────────
+async function saveGmail(){
+  const gmail       = document.getElementById('gmailAddress').value.trim();
+  const appPassword = document.getElementById('gmailAppPassword').value.trim();
+  const msgEl       = document.getElementById('gmailSaveMsg');
+  if(!gmail||!appPassword){alert('Please fill in both fields.');return;}
+  msgEl.style.display='flex'; msgEl.className='note teal'; msgEl.textContent='Verifying Gmail connection…';
+  try{
+    const res  = await fetch('/api/save-gmail',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gmail,app_password:appPassword})});
+    const data = await res.json();
+    if(data.ok){
+      msgEl.className='note green'; msgEl.textContent='✅ Gmail connected successfully!';
+      await loadMe();
+    } else {
+      msgEl.className='note red'; msgEl.textContent='⚠ '+data.error;
+    }
+  }catch(e){msgEl.className='note red'; msgEl.textContent='⚠ Error: '+e.message;}
+}
+
+
+  if(!csvFilename)return;
+  window.location.href='/api/download/'+encodeURIComponent(csvFilename);
+}
+
+function showNote(msg,type){
+  const el=document.createElement('div');
+  el.className='note '+type;
+  el.textContent=msg;
+  el.style.cssText='position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;max-width:320px;box-shadow:0 4px 16px rgba(0,0,0,.15)';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+function startOver(){
+  allCandidates=[]; csvFilename='';
+  ['jobTitle','location','experience','industry','academic','preferredCompanies','jdText'].forEach(id=>{document.getElementById(id).value='';document.getElementById(id).classList.remove('err');});
+  document.getElementById('seniority').selectedIndex=0;
+  document.getElementById('maxSearches').value='6';
   clearTags('techTags','techWrap');
   clearTags('funcTags','funcWrap');
-  document.getElementById('techWrap').style.borderColor = '';
-  document.getElementById('validationError').style.display = 'none';
-  document.getElementById('xrayList').innerHTML = '';
-  document.getElementById('searchLog').innerHTML = '';
-  document.getElementById('xraySection').style.display = 'none';
-  document.getElementById('searchLogCard').style.display = 'none';
-  document.getElementById('mainBar').style.width = '0%';
-  document.getElementById('mainSpinner').style.display = 'block';
-  document.getElementById('filenameLabel').textContent = '';
+  document.getElementById('techWrap').style.borderColor='';
+  document.getElementById('validationError').style.display='none';
+  document.getElementById('xrayList').innerHTML='';
+  document.getElementById('searchLog').innerHTML='';
+  document.getElementById('candBody').innerHTML='';
+  document.getElementById('xraySection').style.display='none';
+  document.getElementById('searchLogCard').style.display='none';
+  document.getElementById('mainBar').style.width='0%';
+  document.getElementById('mainSpinner').style.display='block';
+  document.getElementById('emailSubject').value='';
+  document.getElementById('emailBody').value='';
   goTo(1);
 }
 </script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </body>
 </html>
