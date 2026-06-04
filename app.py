@@ -17,6 +17,8 @@ from supabase import create_client, Client
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "mrs-sourcer-secret-change-in-prod")
+app.config["SESSION_PERMANENT"] = True
+app.config["PERMANENT_SESSION_LIFETIME"] = 86400 * 7  # 7 days
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -48,7 +50,10 @@ def login_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         if "user_id" not in session:
-            return jsonify({"error": "Please log in"}), 401
+            # Always return JSON for API routes
+            if request.path.startswith("/api/"):
+                return jsonify({"ok": False, "error": "Session expired. Please log in again."}), 401
+            return redirect("/")
         return f(*args, **kwargs)
     return decorated
 
