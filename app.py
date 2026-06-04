@@ -28,7 +28,7 @@ RAZORPAY_KEY_ID     = os.environ.get("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 GROQ_API_KEY        = os.environ.get("GROQ_API_KEY", "")
 SERP_API_KEY        = os.environ.get("SERP_API_KEY", "")
-PROSPEO_API_KEY     = os.environ.get("PROSPEO_API_KEY", "")
+APOLLO_API_KEY      = os.environ.get("APOLLO_API_KEY", "")
 
 GROQ_MODEL = "llama-3.3-70b-versatile"
 OUTPUT_DIR = Path("output")
@@ -203,31 +203,41 @@ Return ONLY JSON array of {len(batch)} objects, no markdown:
 
 # ── Email finder ──────────────────────────────────────────────────────────────
 
-def find_email_prospeo(linkedin_url):
+def find_email_apollo(linkedin_url, name=""):
     try:
-        # Clean the LinkedIn URL
-        clean_url = re.sub(r"\?.*$", "", linkedin_url).rstrip("/")
+        # Clean LinkedIn URL
+        clean_url = linkedin_url.rstrip("/").split("?")[0]
         if not clean_url.startswith("https://"):
             clean_url = "https://" + clean_url.lstrip("/")
 
-        url     = "https://api.prospeo.io/linkedin-email-finder"
-        headers = {"Content-Type": "application/json", "X-KEY": PROSPEO_API_KEY}
-        resp    = req.post(url, headers=headers, json={"url": clean_url}, timeout=15)
+        # Extract username from LinkedIn URL
+        username = clean_url.rstrip("/").split("/in/")[-1].rstrip("/")
 
-        print(f"Prospeo status: {resp.status_code} for {clean_url}")
+        # Try Apollo people/match endpoint first
+        url  = "https://api.apollo.io/v1/people/match"
+        headers = {"Content-Type": "application/json", "Cache-Control": "no-cache"}
+        body = {
+            "api_key": APOLLO_API_KEY,
+            "linkedin_url": clean_url,
+            "reveal_personal_emails": True,
+        }
+        resp = req.post(url, headers=headers, json=body, timeout=20)
+        print(f"Apollo status: {resp.status_code} for {clean_url}")
         data = resp.json()
-        print(f"Prospeo response: {data}")
+        print(f"Apollo response: {data}")
 
-        # Prospeo returns error: false when successful
-        if not data.get("error") and data.get("response"):
-            email_data = data["response"].get("email")
-            if email_data and isinstance(email_data, dict):
-                return email_data.get("value")
-            elif email_data and isinstance(email_data, str):
-                return email_data
+        person = data.get("person") or {}
+        # Try work email first, then personal
+        email = person.get("email")
+        if not email:
+            personal = person.get("personal_emails", [])
+            if personal:
+                email = personal[0]
+        if email:
+            return email
         return None
     except Exception as e:
-        print(f"Prospeo error for {linkedin_url}: {e}")
+        print(f"Apollo error for {linkedin_url}: {e}")
         return None
 
 # ── Auth routes ───────────────────────────────────────────────────────────────
@@ -412,7 +422,7 @@ def find_emails():
         return jsonify({"ok": False, "error": err}), 403
     results = []
     for url in linkedin_urls:
-        email = find_email_prospeo(url)
+        email = find_email_apollo(url)
         results.append({"linkedin": url, "email": email or ""})
         if email:
             increment_usage(session["user_id"], "email")
