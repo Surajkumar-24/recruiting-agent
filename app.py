@@ -308,7 +308,9 @@ def check_keys():
 @app.route("/api/run")
 @login_required
 def run_pipeline():
-    can, err = check_usage(session["user_id"], "search")
+    # Capture session data before generator starts
+    user_id = session["user_id"]
+    can, err = check_usage(user_id, "search")
     if not can:
         def error_gen():
             yield f"event: error\ndata: {err}\n\n"
@@ -368,7 +370,7 @@ def run_pipeline():
                 for i, c in enumerate(candidates,1):
                     writer.writerow({"Rank":i,"Name":c.get("name",""),"LinkedIn URL":c.get("linkedin",""),"Headline":c.get("headline",""),"Match Score":f"{c.get('score',0)}%","Reason":c.get("reason",""),"Source String":c.get("source_string",""),"Date Sourced":today,"Email":"","Contacted":"No"})
 
-            increment_usage(session["user_id"], "search")
+            increment_usage(user_id, "search")
             yield f"event: candidates\ndata: {json.dumps(candidates)}\n\n"
             yield f"event: status\ndata: {json.dumps({'step':4,'msg':f'Done! {len(candidates)} candidates sourced.','pct':100})}\n\n"
             yield f"event: done\ndata: {json.dumps({'file':filename.name,'count':len(candidates)})}\n\n"
