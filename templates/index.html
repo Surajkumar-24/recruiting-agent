@@ -780,10 +780,23 @@ async function findEmails(){
   const btn=document.getElementById('findEmailsBtn');
   btn.disabled=true; btn.textContent='Finding emails…';
 
+  // First check session is still alive
+  const sessionCheck = await fetch('/api/me');
+  const sessionData = await sessionCheck.json();
+  if(!sessionData.logged_in){
+    alert('Your session expired. Please log in again.');
+    btn.disabled=false; btn.textContent='🔍 Find emails for selected';
+    document.getElementById('authOverlay').style.display='flex';
+    return;
+  }
+
   const urls=selected.map(c=>c.linkedin);
+  console.log('Sending to /api/find-emails:', urls.length, 'URLs');
   try{
     const res=await fetch('/api/find-emails',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({linkedin_urls:urls})});
+    console.log('Response status:', res.status);
     const data=await res.json();
+    console.log('Response data:', data);
     if(!data.ok){alert('Error: '+data.error);btn.disabled=false;btn.textContent='🔍 Find emails for selected';return;}
     data.results.forEach(r=>{
       const idx=allCandidates.findIndex(c=>c.linkedin===r.linkedin);
@@ -794,9 +807,12 @@ async function findEmails(){
       }
     });
     const found=data.results.filter(r=>r.email).length;
-    showNote(`✅ Found ${found}/${selected.length} emails`, 'green');
+    showNote(`✅ Found ${found}/${selected.length} emails`, found>0?'green':'amber');
     loadMe();
-  }catch(e){alert('Error: '+e.message);}
+  }catch(e){
+    console.error('Find emails error:', e);
+    alert('Error: '+e.message);
+  }
   btn.disabled=false; btn.textContent='🔍 Find emails for selected';
 }
 
