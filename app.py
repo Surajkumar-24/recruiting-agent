@@ -210,24 +210,22 @@ def find_email_apollo(linkedin_url, name=""):
         if not clean_url.startswith("https://"):
             clean_url = "https://" + clean_url.lstrip("/")
 
-        # Extract username from LinkedIn URL
-        username = clean_url.rstrip("/").split("/in/")[-1].rstrip("/")
-
-        # Try Apollo people/match endpoint first
-        url  = "https://api.apollo.io/v1/people/match"
-        headers = {"Content-Type": "application/json", "Cache-Control": "no-cache"}
+        url = "https://api.apollo.io/v1/people/match"
+        headers = {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+            "X-Api-Key": APOLLO_API_KEY
+        }
         body = {
-            "api_key": APOLLO_API_KEY,
             "linkedin_url": clean_url,
             "reveal_personal_emails": True,
         }
         resp = req.post(url, headers=headers, json=body, timeout=20)
         print(f"Apollo status: {resp.status_code} for {clean_url}")
         data = resp.json()
-        print(f"Apollo response: {data}")
+        print(f"Apollo response: {str(data)[:300]}")
 
         person = data.get("person") or {}
-        # Try work email first, then personal
         email = person.get("email")
         if not email:
             personal = person.get("personal_emails", [])
@@ -420,13 +418,27 @@ def find_emails():
     can, err = check_usage(session["user_id"], "email")
     if not can:
         return jsonify({"ok": False, "error": err}), 403
+
+    # Only process first 5 URLs to avoid timeout on free Render plan
+    urls_to_process = linkedin_urls[:5]
+    print(f"Processing {len(urls_to_process)} URLs for email finding")
+
     results = []
-    for url in linkedin_urls:
+    for url in urls_to_process:
+        print(f"Finding email for: {url}")
         email = find_email_apollo(url)
+        print(f"Result for {url}: {email}")
         results.append({"linkedin": url, "email": email or ""})
         if email:
             increment_usage(session["user_id"], "email")
-        time.sleep(0.5)
+        time.sleep(1)
+
+    # Add remaining URLs as not found
+    for url in linkedin_urls[5:]:
+        results.append({"linkedin": url, "email": ""})
+
+    found = len([r for r in results if r["email"]])
+    print(f"Email finding complete: {found}/{len(linkedin_urls)} found")
     return jsonify({"ok": True, "results": results})
 
 @app.route("/api/send-emails", methods=["POST"])
@@ -520,6 +532,10 @@ def download(filename):
     if not path.exists():
         return "File not found", 404
     return send_file(path, as_attachment=True, download_name=filename)
+
+@app.route("/test-apollo")
+def test_apollo():
+    return render_template("test_apollo.html")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
