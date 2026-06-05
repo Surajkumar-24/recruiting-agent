@@ -28,7 +28,8 @@ RAZORPAY_KEY_ID     = os.environ.get("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.environ.get("RAZORPAY_KEY_SECRET", "")
 GROQ_API_KEY        = os.environ.get("GROQ_API_KEY", "")
 SERP_API_KEY        = os.environ.get("SERP_API_KEY", "")
-APOLLO_API_KEY      = os.environ.get("APOLLO_API_KEY", "")
+SNOV_CLIENT_ID     = os.environ.get("SNOV_CLIENT_ID", "")
+SNOV_CLIENT_SECRET = os.environ.get("SNOV_CLIENT_SECRET", "")
 
 GROQ_MODEL = "llama-3.3-70b-versatile"
 OUTPUT_DIR = Path("output")
@@ -203,39 +204,55 @@ Return ONLY JSON array of {len(batch)} objects, no markdown:
 
 # ── Email finder ──────────────────────────────────────────────────────────────
 
-def find_email_apollo(linkedin_url, name=""):
+def get_snov_token():
+    """Get Snov.io access token."""
+    resp = req.post("https://api.snov.io/v1/oauth/access_token", data={
+        "grant_type": "client_credentials",
+        "client_id": SNOV_CLIENT_ID,
+        "client_secret": SNOV_CLIENT_SECRET
+    }, timeout=15)
+    resp.raise_for_status()
+    return resp.json().get("access_token")
+
+def find_email_snov(linkedin_url):
     try:
         # Clean LinkedIn URL
         clean_url = linkedin_url.rstrip("/").split("?")[0]
         if not clean_url.startswith("https://"):
             clean_url = "https://" + clean_url.lstrip("/")
 
-        url = "https://api.apollo.io/v1/people/match"
-        headers = {
-            "Content-Type": "application/json",
-            "Cache-Control": "no-cache",
-            "X-Api-Key": APOLLO_API_KEY
-        }
-        body = {
-            "linkedin_url": clean_url,
-            "reveal_personal_emails": True,
-        }
-        resp = req.post(url, headers=headers, json=body, timeout=20)
-        print(f"Apollo status: {resp.status_code} for {clean_url}")
-        data = resp.json()
-        print(f"Apollo response: {str(data)[:300]}")
+        print(f"Finding email via Snov for: {clean_url}")
 
-        person = data.get("person") or {}
-        email = person.get("email")
-        if not email:
-            personal = person.get("personal_emails", [])
-            if personal:
-                email = personal[0]
-        if email:
-            return email
+        # Get access token
+        token = get_snov_token()
+        headers = {"Authorization": f"Bearer {token}"}
+
+        # Add LinkedIn URL to Snov prospect list
+        add_resp = req.post("https://api.snov.io/v1/add-prospect-to-list",
+            headers=headers,
+            json={"linkedinUrl": clean_url},
+            timeout=15
+        )
+        print(f"Snov add prospect status: {add_resp.status_code}")
+        add_data = add_resp.json()
+        print(f"Snov add prospect response: {str(add_data)[:300]}")
+
+        # Get email from profile URL
+        email_resp = req.post("https://api.snov.io/v1/get-emails-from-url",
+            headers=headers,
+            json={"url": clean_url},
+            timeout=15
+        )
+        print(f"Snov email status: {email_resp.status_code}")
+        email_data = email_resp.json()
+        print(f"Snov email response: {str(email_data)[:300]}")
+
+        emails = email_data.get("emails", [])
+        if emails:
+            return emails[0].get("email")
         return None
     except Exception as e:
-        print(f"Apollo error for {linkedin_url}: {e}")
+        print(f"Snov error for {linkedin_url}: {e}")
         return None
 
 # ── Auth routes ───────────────────────────────────────────────────────────────
@@ -431,7 +448,7 @@ def find_emails():
     for url in urls_to_process:
         print(f"Finding email for: {url}")
         try:
-            email = find_email_apollo(url)
+            email = find_email_snov(url)
         except Exception as e:
             print(f"Exception finding email: {e}")
             email = None
