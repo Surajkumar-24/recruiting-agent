@@ -216,36 +216,32 @@ def get_snov_token():
 
 def find_email_snov(linkedin_url):
     try:
-        # Clean LinkedIn URL
         clean_url = linkedin_url.rstrip("/").split("?")[0]
         if not clean_url.startswith("https://"):
             clean_url = "https://" + clean_url.lstrip("/")
 
         print(f"Finding email via Snov for: {clean_url}")
-
-        # Get access token
         token = get_snov_token()
         headers = {"Authorization": f"Bearer {token}"}
 
-        # Add LinkedIn URL to Snov prospect list
-        add_resp = req.post("https://api.snov.io/v1/add-prospect-to-list",
+        # Step 1: Add URL for search
+        add_resp = req.post("https://api.snov.io/v1/add-url-for-search",
             headers=headers,
-            json={"linkedinUrl": clean_url},
+            json={"url": clean_url},
             timeout=15
         )
-        print(f"Snov add prospect status: {add_resp.status_code}")
-        add_data = add_resp.json()
-        print(f"Snov add prospect response: {str(add_data)[:300]}")
+        print(f"Snov add-url status: {add_resp.status_code} response: {str(add_resp.json())[:200]}")
 
-        # Get email from profile URL
+        time.sleep(3)
+
+        # Step 2: Get emails from URL
         email_resp = req.post("https://api.snov.io/v1/get-emails-from-url",
             headers=headers,
             json={"url": clean_url},
             timeout=15
         )
-        print(f"Snov email status: {email_resp.status_code}")
+        print(f"Snov get-emails status: {email_resp.status_code} response: {str(email_resp.json())[:300]}")
         email_data = email_resp.json()
-        print(f"Snov email response: {str(email_data)[:300]}")
 
         emails = email_data.get("emails", [])
         if emails:
