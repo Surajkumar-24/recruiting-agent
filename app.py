@@ -411,26 +411,34 @@ def run_pipeline():
 @app.route("/api/find-emails", methods=["POST"])
 @login_required
 def find_emails():
-    data          = request.json
+    user_id       = session["user_id"]
+    data          = request.json or {}
     linkedin_urls = data.get("linkedin_urls", [])
+
+    print(f"find_emails called with {len(linkedin_urls)} URLs by user {user_id}")
+
     if not linkedin_urls:
         return jsonify({"ok": False, "error": "No URLs provided"}), 400
-    can, err = check_usage(session["user_id"], "email")
+    can, err = check_usage(user_id, "email")
     if not can:
         return jsonify({"ok": False, "error": err}), 403
 
     # Only process first 5 URLs to avoid timeout on free Render plan
     urls_to_process = linkedin_urls[:5]
-    print(f"Processing {len(urls_to_process)} URLs for email finding")
+    print(f"Processing {len(urls_to_process)} URLs")
 
     results = []
     for url in urls_to_process:
         print(f"Finding email for: {url}")
-        email = find_email_apollo(url)
-        print(f"Result for {url}: {email}")
+        try:
+            email = find_email_apollo(url)
+        except Exception as e:
+            print(f"Exception finding email: {e}")
+            email = None
+        print(f"Result: {email}")
         results.append({"linkedin": url, "email": email or ""})
         if email:
-            increment_usage(session["user_id"], "email")
+            increment_usage(user_id, "email")
         time.sleep(1)
 
     # Add remaining URLs as not found
